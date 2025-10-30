@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useData } from "../../data/DataContext.jsx";
 
 export default function LoginForm() {

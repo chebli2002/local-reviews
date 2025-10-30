@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useData } from "./data/DataContext.jsx";
 import Navbar from "./components/globals/Navbar.jsx";
 import Home from "./components/Home.jsx";
