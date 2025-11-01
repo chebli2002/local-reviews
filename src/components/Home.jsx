@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useData } from "../data/DataContext.jsx";
 
 export default function Home() {
@@ -137,7 +138,9 @@ export default function Home() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-70 group-hover:opacity-60 transition-opacity duration-500"></div>
 
                     <div className="absolute bottom-6 left-6 text-white drop-shadow-md">
-                      <h3 className="text-2xl font-semibold text-white">{c.name}</h3>
+                      <h3 className="text-2xl font-semibold text-white">
+                        {c.name}
+                      </h3>
                       <p className="text-sm text-gray-200">
                         Explore {c.name} in your area
                       </p>
