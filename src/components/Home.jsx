@@ -1,10 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Star } from "lucide-react";
 import { useData } from "../data/DataContext.jsx";
 
 export default function Home() {
   const { businesses, categories } = useData();
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
 
   useEffect(() => {
     const elements = document.querySelectorAll(".fade-in");
@@ -17,6 +21,18 @@ export default function Home() {
       { threshold: 0.2 }
     );
     elements.forEach((el) => observer.observe(el));
+  }, []);
+
+  // 🌓 Watch for dark mode toggle dynamically
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
   }, []);
 
   const top = [...businesses]
@@ -61,8 +77,11 @@ export default function Home() {
             }}
             initial="hidden"
             animate="show"
-            className="leading-tight font-extrabold drop-shadow-xl text-gray-900 dark:text-white text-[10vw] sm:text-[8rem]"
-            style={{ whiteSpace: "pre-line" }}
+            className="leading-tight font-extrabold drop-shadow-xl text-[10vw] sm:text-[8rem] transition-colors duration-500"
+            style={{
+              whiteSpace: "pre-line",
+              color: isDark ? "white" : "#111827",
+            }}
           >
             {title.split("").map((char, i) => (
               <motion.span
@@ -82,7 +101,10 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 1.2 }}
-            className="text-xl sm:text-2xl text-gray-800 dark:text-white mt-6 mb-12 max-w-3xl"
+            className="text-xl sm:text-2xl mt-6 mb-12 max-w-3xl transition-colors duration-500"
+            style={{
+              color: isDark ? "white" : "#1F2937",
+            }}
           >
             Read trusted reviews, share your experience, and explore top-rated
             spots near you.
@@ -110,7 +132,12 @@ export default function Home() {
           viewport={{ once: true, amount: 0.2 }}
           className="fade-in max-w-7xl mx-auto"
         >
-          <h2 className="text-3xl font-bold mb-12 text-gray-800 dark:text-white text-center">
+          <h2
+            className="text-3xl font-bold mb-12 text-center transition-colors duration-500"
+            style={{
+              color: isDark ? "white" : "#111827",
+            }}
+          >
             Popular Categories
           </h2>
 
@@ -159,7 +186,12 @@ export default function Home() {
           viewport={{ once: true, amount: 0.2 }}
           className="fade-in max-w-7xl mx-auto"
         >
-          <h2 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white text-center">
+          <h2
+            className="text-3xl font-bold mb-8 text-center transition-colors duration-500"
+            style={{
+              color: isDark ? "white" : "#111827",
+            }}
+          >
             Top Rated
           </h2>
 
@@ -176,30 +208,28 @@ export default function Home() {
                 }}
                 className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border"
               >
-                <div
-                  className="rounded-3xl backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 border transition-all duration-500"
-                  style={{
-                    background: "rgba(255,255,255,0.7)",
-                    borderColor: "rgba(255,255,255,0.4)",
-                    boxShadow:
-                      "0 4px 30px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.3)",
-                    color: "#111",
-                  }}
-                >
+                <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500">
                   <div className="flex-1">
                     <Link
                       to={`/businesses/${b.id}`}
-                      className="text-2xl font-semibold text-gray-900 hover:text-indigo-600 transition-colors"
+                      className="text-2xl font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                     >
                       {b.name}
                     </Link>
-                    <p className="text-sm text-gray-700 mt-1">{b.address}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                      {b.address}
+                    </p>
 
                     <div className="mt-3 flex items-center gap-2">
-                      <div className="flex items-center text-yellow-500 text-base">
-                        ⭐ <span className="ml-1">{b.average_rating}</span>
+                      <div className="flex items-center text-gray-900 dark:text-white text-base">
+                        <Star
+                          className={`w-4 h-4 fill-current ${
+                            isDark ? "text-white" : "text-gray-900"
+                          }`}
+                        />
+                        <span className="ml-1">{b.average_rating}</span>
                       </div>
-                      <span className="text-gray-700 text-sm">
+                      <span className="text-gray-600 dark:text-gray-300 text-sm">
                         • {b.review_count} reviews
                       </span>
                     </div>
@@ -208,7 +238,7 @@ export default function Home() {
                   <div className="flex gap-3 items-end md:items-center justify-end">
                     <Link
                       to={`/businesses/${b.id}`}
-                      className="btn-outline px-4 py-2 text-gray-900"
+                      className="btn-outline px-4 py-2"
                     >
                       View
                     </Link>

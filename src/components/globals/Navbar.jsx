@@ -1,11 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useData } from "../../data/DataContext.jsx";
 
 export default function Navbar() {
   const { currentUser, logout } = useData();
   const navigate = useNavigate();
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+
+  // 🌓 Watch for dark mode toggle dynamically
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <header
@@ -25,10 +41,19 @@ export default function Navbar() {
         </Link>
 
         {/* Navigation Links */}
-        <nav className="flex items-center gap-6 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+        <nav className="flex items-center gap-6 transition-colors duration-300">
           <NavLink
             to="/businesses"
-            className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
+            className="transition-colors duration-300"
+            style={{
+              color: isDark ? "#F3F4F6" : "#111827",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = isDark ? "#F3F4F6" : "#111827";
+            }}
           >
             All Businesses
           </NavLink>
@@ -37,13 +62,31 @@ export default function Navbar() {
             <>
               <NavLink
                 to="/businesses/new"
-                className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
+                className="transition-colors duration-300"
+                style={{
+                  color: isDark ? "#F3F4F6" : "#111827",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = isDark ? "#F3F4F6" : "#111827";
+                }}
               >
                 Add Business
               </NavLink>
               <NavLink
                 to={`/users/${currentUser.id}/reviews`}
-                className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
+                className="transition-colors duration-300"
+                style={{
+                  color: isDark ? "#F3F4F6" : "#111827",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = isDark ? "#F3F4F6" : "#111827";
+                }}
               >
                 My Reviews
               </NavLink>
@@ -54,13 +97,31 @@ export default function Navbar() {
             <>
               <NavLink
                 to="/login"
-                className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
+                className="transition-colors duration-300"
+                style={{
+                  color: isDark ? "#F3F4F6" : "#111827",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = isDark ? "#F3F4F6" : "#111827";
+                }}
               >
                 Log in
               </NavLink>
               <NavLink
                 to="/register"
-                className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
+                className="transition-colors duration-300"
+                style={{
+                  color: isDark ? "#F3F4F6" : "#111827",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = isDark ? "#F3F4F6" : "#111827";
+                }}
               >
                 Register
               </NavLink>

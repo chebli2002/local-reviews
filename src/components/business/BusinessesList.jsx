@@ -49,7 +49,7 @@ export default function BusinessesList() {
     });
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-14 space-y-12 text-gray-900">
+    <section className="max-w-7xl mx-auto px-6 py-14 space-y-12 text-gray-900 dark:text-white">
       {/* Title that switches color */}
       <h1
         className="text-4xl font-extrabold text-center tracking-tight mb-6 transition-colors duration-500"
@@ -67,21 +67,25 @@ export default function BusinessesList() {
         transition={{ duration: 0.6 }}
         className="relative p-[2px] rounded-3xl bg-gradient-border shadow-lg"
       >
-        <div className="grid sm:grid-cols-4 gap-3 bg-white/60 backdrop-blur-md rounded-3xl p-4 md:p-6 border border-white/40">
+        <div className="grid sm:grid-cols-4 gap-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-3xl p-4 md:p-6 border border-white/40 dark:border-gray-700/40">
           <div className="col-span-2 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-700 z-10 pointer-events-none" />
+            <Search
+              className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 z-10 pointer-events-none transition-colors ${
+                isDark ? "text-white" : "text-gray-700"
+              }`}
+            />
             <input
               value={term}
               onChange={(e) => setTerm(e.target.value)}
               placeholder="Search by name or address..."
-              className="w-full rounded-xl pl-10 pr-4 py-3 bg-white/70 backdrop-blur-md border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 text-gray-800 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+              className="w-full rounded-xl pl-10 pr-4 py-3 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
             />
           </div>
 
           <select
             value={cat}
             onChange={(e) => setCat(e.target.value)}
-            className="rounded-xl px-3 py-3 bg-white/70 backdrop-blur-md border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 text-gray-800 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+            className="rounded-xl px-3 py-3 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 text-gray-800 dark:text-white outline-none transition-all duration-300 shadow-sm hover:shadow-md"
           >
             <option value="all">All Categories</option>
             {categories.map((c) => (
@@ -94,7 +98,7 @@ export default function BusinessesList() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="rounded-xl px-3 py-3 bg-white/70 backdrop-blur-md border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 text-gray-800 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+            className="rounded-xl px-3 py-3 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 text-gray-800 dark:text-white outline-none transition-all duration-300 shadow-sm hover:shadow-md"
           >
             <option value="rating">Sort: Rating</option>
             <option value="reviews">Sort: Reviews</option>
@@ -118,22 +122,28 @@ export default function BusinessesList() {
               }}
               className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border"
             >
-              <div className="rounded-3xl bg-white/70 backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-white/80 transition-all duration-500">
+              <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500">
                 <div className="flex-1">
                   <Link
                     to={`/businesses/${b.id}`}
-                    className="text-2xl font-semibold hover:text-indigo-600 transition-colors"
+                    className="text-2xl font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   >
                     {b.name}
                   </Link>
-                  <p className="text-sm text-gray-600">{b.address}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {b.address}
+                  </p>
 
                   <div className="mt-3 flex items-center gap-2">
-                    <div className="flex items-center text-gray-900 text-base">
-                      <Star className="w-4 h-4 fill-current text-gray-900" />
+                    <div className="flex items-center text-gray-900 dark:text-white text-base">
+                      <Star
+                        className={`w-4 h-4 fill-current ${
+                          isDark ? "text-white" : "text-gray-900"
+                        }`}
+                      />
                       <span className="ml-1">{b.average_rating}</span>
                     </div>
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-gray-600 dark:text-gray-300 text-sm">
                       • {b.review_count} reviews
                     </span>
                   </div>
@@ -157,7 +167,7 @@ export default function BusinessesList() {
             </motion.div>
           ))
         ) : (
-          <div className="text-gray-600 text-center py-10 text-lg">
+          <div className="text-gray-600 dark:text-white text-center py-10 text-lg">
             No businesses found.
           </div>
         )}
