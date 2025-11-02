@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
 import { useData } from "../data/DataContext.jsx";
 
 export default function Home() {
@@ -31,7 +30,6 @@ export default function Home() {
 
   const title = "Discover the Best Local Businesses";
 
-  // Category Images
   const categoryImages = {
     "Food & Drink":
       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
@@ -104,7 +102,7 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* POPULAR CATEGORIES (with parallax images) */}
+        {/* POPULAR CATEGORIES */}
         <motion.section
           variants={fadeInUp}
           initial="hidden"
@@ -153,7 +151,7 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* TOP RATED (same as before) */}
+        {/* 🌟 TOP RATED — MATCHED EXACTLY WITH BUSINESSLIST */}
         <motion.section
           variants={fadeInUp}
           initial="hidden"
@@ -161,43 +159,67 @@ export default function Home() {
           viewport={{ once: true, amount: 0.2 }}
           className="fade-in max-w-7xl mx-auto"
         >
-          <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white text-center">
+          <h2 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white text-center">
             Top Rated
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
+
+          <div className="grid md:grid-cols-2 gap-8">
             {top.map((b, i) => (
               <motion.div
                 key={b.id}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: i * 0.06 }}
-                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
                 whileHover={{
                   scale: 1.03,
-                  boxShadow: "0 0 40px rgba(147, 197, 253, 0.3)",
-                  transition: { duration: 0.4 },
+                  boxShadow: "0 0 40px rgba(147, 197, 253, 0.25)",
                 }}
+                className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border"
               >
-                <Link
-                  to={`/businesses/${b.id}`}
-                  className="block p-[2px] rounded-3xl bg-gradient-border transition-all duration-500"
+                <div
+                  className="rounded-3xl backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 border transition-all duration-500"
+                  style={{
+                    background: "rgba(255,255,255,0.7)",
+                    borderColor: "rgba(255,255,255,0.4)",
+                    boxShadow:
+                      "0 4px 30px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.3)",
+                    color: "#111",
+                  }}
                 >
-                  <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500">
-                    <h3 className="text-xl font-semibold mb-1 text-gray-900 dark:text-white">
+                  <div className="flex-1">
+                    <Link
+                      to={`/businesses/${b.id}`}
+                      className="text-2xl font-semibold text-gray-900 hover:text-indigo-600 transition-colors"
+                    >
                       {b.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-white">
-                      {b.address}
-                    </p>
-                    <div className="mt-3 text-sm text-gray-900 dark:text-white flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-current text-gray-900 dark:text-white" />
-                      {b.average_rating}{" "}
-                      <span className="text-gray-600 dark:text-white">
+                    </Link>
+                    <p className="text-sm text-gray-700 mt-1">{b.address}</p>
+
+                    <div className="mt-3 flex items-center gap-2">
+                      <div className="flex items-center text-yellow-500 text-base">
+                        ⭐ <span className="ml-1">{b.average_rating}</span>
+                      </div>
+                      <span className="text-gray-700 text-sm">
                         • {b.review_count} reviews
                       </span>
                     </div>
                   </div>
-                </Link>
+
+                  <div className="flex gap-3 items-end md:items-center justify-end">
+                    <Link
+                      to={`/businesses/${b.id}`}
+                      className="btn-outline px-4 py-2 text-gray-900"
+                    >
+                      View
+                    </Link>
+                    <Link
+                      to={`/businesses/${b.id}/review`}
+                      className="btn-primary px-4 py-2"
+                    >
+                      Review
+                    </Link>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>

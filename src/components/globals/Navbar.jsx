@@ -8,20 +8,27 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200/60 dark:border-gray-800/60 shadow-sm">
+    <header
+      className="nav-glow fixed top-0 left-0 w-full z-50 backdrop-blur-sm 
+      bg-gradient-aurora bg-aurora-overlay dark:bg-[#2a123c]/70 
+      transition-all duration-700 border-b border-white/20 dark:border-purple-900/40 
+      shadow-md dark:shadow-purple-900/20"
+    >
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+        {/* Logo */}
         <Link
           to="/"
-          className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight"
+          className="text-2xl font-bold text-indigo-600 dark:text-pink-300 tracking-tight drop-shadow-md"
         >
           Local
           <span className="text-purple-600 dark:text-purple-400">Reviews</span>
         </Link>
 
-        <nav className="flex items-center gap-6 text-gray-900 dark:text-gray-100">
+        {/* Navigation Links */}
+        <nav className="flex items-center gap-6 text-gray-900 dark:text-gray-100 transition-colors duration-300">
           <NavLink
             to="/businesses"
-            className="hover:text-indigo-700 dark:hover:text-indigo-300"
+            className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
           >
             All Businesses
           </NavLink>
@@ -30,13 +37,13 @@ export default function Navbar() {
             <>
               <NavLink
                 to="/businesses/new"
-                className="hover:text-indigo-700 dark:hover:text-indigo-300"
+                className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
               >
                 Add Business
               </NavLink>
               <NavLink
                 to={`/users/${currentUser.id}/reviews`}
-                className="hover:text-indigo-700 dark:hover:text-indigo-300"
+                className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
               >
                 My Reviews
               </NavLink>
@@ -47,13 +54,13 @@ export default function Navbar() {
             <>
               <NavLink
                 to="/login"
-                className="hover:text-indigo-700 dark:hover:text-indigo-300"
+                className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
               >
                 Log in
               </NavLink>
               <NavLink
                 to="/register"
-                className="hover:text-indigo-700 dark:hover:text-indigo-300"
+                className="hover:text-indigo-700 dark:hover:text-pink-400 transition"
               >
                 Register
               </NavLink>
@@ -64,7 +71,7 @@ export default function Navbar() {
                 logout();
                 navigate("/");
               }}
-              className="btn-primary px-3 py-1"
+              className="btn-primary px-3 py-1 text-sm shadow-sm"
             >
               Logout ({currentUser.username})
             </button>
