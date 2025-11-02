@@ -1,5 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Star } from "lucide-react";
 import { useData } from "../../data/DataContext.jsx";
 
 export default function BusinessDetail() {
@@ -59,8 +60,9 @@ export default function BusinessDetail() {
               )}
             </div>
 
-            <div className="mt-4 text-yellow-500 text-base font-semibold flex items-center gap-2">
-              ⭐ {business.average_rating}
+            <div className="mt-4 text-gray-900 text-base font-semibold flex items-center gap-2">
+              <Star className="w-5 h-5 fill-current text-gray-900" />
+              {business.average_rating}
               <span className="text-gray-600 font-normal">
                 • {bizReviews.length} reviews
               </span>
@@ -132,8 +134,9 @@ export default function BusinessDetail() {
                       <div className="font-semibold text-gray-900 text-lg">
                         {r.user?.username ?? "Anonymous"}
                       </div>
-                      <div className="text-sm text-yellow-500 font-medium">
-                        ⭐ {r.rating} / 5
+                      <div className="text-sm text-gray-900 font-medium flex items-center gap-1">
+                        <Star className="w-4 h-4 fill-current text-gray-900" />
+                        {r.rating} / 5
                       </div>
                     </div>
                     <div className="text-gray-400 text-xs">

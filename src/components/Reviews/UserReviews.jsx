@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Star } from "lucide-react";
 import { useData } from "../../data/DataContext.jsx";
 
 export default function UserReviews() {
@@ -66,8 +67,9 @@ export default function UserReviews() {
                   >
                     {r.business?.name ?? "Business"}
                   </Link>
-                  <div className="text-yellow-500 font-medium text-lg">
-                    ⭐ {r.rating}
+                  <div className="text-gray-900 font-medium text-lg flex items-center gap-1">
+                    <Star className="w-5 h-5 fill-current text-gray-900" />
+                    {r.rating}
                   </div>
                 </div>
 

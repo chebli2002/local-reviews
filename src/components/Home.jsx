@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Star } from "lucide-react";
 import { useData } from "../data/DataContext.jsx";
 
 export default function Home() {
@@ -192,14 +193,13 @@ export default function Home() {
                       className="text-2xl font-semibold text-gray-900 hover:text-indigo-600 transition-colors"
                     >
                       {b.name}
-                    </Link>
-                    <p className="text-sm text-gray-700 mt-1">{b.address}</p>
-
-                    <div className="mt-3 flex items-center gap-2">
-                      <div className="flex items-center text-yellow-500 text-base">
-                        ⭐ <span className="ml-1">{b.average_rating}</span>
-                      </div>
-                      <span className="text-gray-700 text-sm">
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-white">
+                      {b.address}
+                    </p>
+                    <div className="mt-3 text-sm text-yellow-500">
+                      ⭐ {b.average_rating}{" "}
+                      <span className="text-gray-600 dark:text-white">
                         • {b.review_count} reviews
                       </span>
                     </div>
