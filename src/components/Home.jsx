@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Star } from "lucide-react";
 import { useData } from "../data/DataContext.jsx";
 
 export default function Home() {
@@ -188,8 +189,9 @@ export default function Home() {
                     <p className="text-sm text-gray-500 dark:text-white">
                       {b.address}
                     </p>
-                    <div className="mt-3 text-sm text-yellow-500">
-                      ⭐ {b.average_rating}{" "}
+                    <div className="mt-3 text-sm text-gray-900 dark:text-white flex items-center gap-1">
+                      <Star className="w-4 h-4 fill-current text-gray-900 dark:text-white" />
+                      {b.average_rating}{" "}
                       <span className="text-gray-600 dark:text-white">
                         • {b.review_count} reviews
                       </span>

@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useData } from "../../data/DataContext.jsx";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { Search, Star } from "lucide-react";
 
 function useQuery() {
   const { search } = useLocation();
@@ -46,12 +47,15 @@ export default function BusinessesList() {
         className="relative p-[2px] rounded-3xl bg-gradient-border shadow-lg"
       >
         <div className="grid sm:grid-cols-4 gap-3 bg-white/60 backdrop-blur-md rounded-3xl p-4 md:p-6 border border-white/40">
-          <input
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-            placeholder="🔍  Search by name or address..."
-            className="col-span-2 rounded-xl px-4 py-3 bg-white/70 backdrop-blur-md border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 text-gray-800 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
-          />
+          <div className="col-span-2 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-700 z-10 pointer-events-none" />
+            <input
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+              placeholder="Search by name or address..."
+              className="w-full rounded-xl pl-10 pr-4 py-3 bg-white/70 backdrop-blur-md border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 text-gray-800 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+            />
+          </div>
 
           <select
             value={cat}
@@ -104,8 +108,9 @@ export default function BusinessesList() {
                   <p className="text-sm text-gray-600">{b.address}</p>
 
                   <div className="mt-3 flex items-center gap-2">
-                    <div className="flex items-center text-yellow-500 text-base">
-                      ⭐ <span className="ml-1">{b.average_rating}</span>
+                    <div className="flex items-center text-gray-900 text-base">
+                      <Star className="w-4 h-4 fill-current text-gray-900" />
+                      <span className="ml-1">{b.average_rating}</span>
                     </div>
                     <span className="text-gray-600 text-sm">
                       • {b.review_count} reviews
