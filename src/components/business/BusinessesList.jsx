@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useData } from "../../data/DataContext.jsx";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, Star } from "lucide-react";
 
@@ -16,6 +16,21 @@ export default function BusinessesList() {
   const [term, setTerm] = useState(qs.get("q") || "");
   const [cat, setCat] = useState(qs.get("category") || "all");
   const [sort, setSort] = useState("rating");
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+
+  // 🌓 Watch for dark mode toggle dynamically
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   const filtered = businesses
     .filter(
@@ -35,7 +50,13 @@ export default function BusinessesList() {
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-14 space-y-12 text-gray-900">
-      <h1 className="text-4xl font-extrabold text-center tracking-tight mb-6">
+      {/* Title that switches color */}
+      <h1
+        className="text-4xl font-extrabold text-center tracking-tight mb-6 transition-colors duration-500"
+        style={{
+          color: isDark ? "white" : "#111827",
+        }}
+      >
         All Businesses
       </h1>
 
