@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useData } from "./data/DataContext.jsx";
 import Navbar from "./components/globals/Navbar.jsx";
+import DarkModeToggle from "./components/globals/DarkModeToggle.jsx";
 import Home from "./components/Home.jsx";
 import BusinessesList from "./components/business/BusinessesList.jsx";
 import BusinessDetail from "./components/business/BusinessDetail.jsx";
@@ -23,7 +24,7 @@ export default function App() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen text-gray-900 bg-gradient-aurora bg-aurora-overlay overflow-hidden">
+    <div className="min-h-screen text-gray-900 dark:text-gray-100 bg-gradient-aurora bg-aurora-overlay overflow-hidden relative">
       <Navbar />
       <AnimatePresence mode="wait">
         <motion.main
@@ -70,6 +71,7 @@ export default function App() {
         </motion.main>
       </AnimatePresence>
       <Footer />
+      <DarkModeToggle />
     </div>
   );
 }

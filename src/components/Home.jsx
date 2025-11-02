@@ -41,7 +41,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen text-gray-900">
+    <div className="relative min-h-screen text-gray-900 dark:text-white">
       <div className="pointer-events-none absolute inset-0 aurora-shimmer" />
 
       <div className="relative z-10 px-6 py-20 space-y-28">
@@ -62,7 +62,7 @@ export default function Home() {
             }}
             initial="hidden"
             animate="show"
-            className="leading-tight font-extrabold drop-shadow-xl text-gray-900 text-[10vw] sm:text-[8rem]"
+            className="leading-tight font-extrabold drop-shadow-xl text-gray-900 dark:text-white text-[10vw] sm:text-[8rem]"
             style={{ whiteSpace: "pre-line" }}
           >
             {title.split("").map((char, i) => (
@@ -83,7 +83,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 1.2 }}
-            className="text-xl sm:text-2xl text-gray-800 mt-6 mb-12 max-w-3xl"
+            className="text-xl sm:text-2xl text-gray-800 dark:text-white mt-6 mb-12 max-w-3xl"
           >
             Read trusted reviews, share your experience, and explore top-rated
             spots near you.
@@ -111,7 +111,7 @@ export default function Home() {
           viewport={{ once: true, amount: 0.2 }}
           className="fade-in max-w-7xl mx-auto"
         >
-          <h2 className="text-3xl font-bold mb-12 text-gray-800 text-center">
+          <h2 className="text-3xl font-bold mb-12 text-gray-800 dark:text-white text-center">
             Popular Categories
           </h2>
 
@@ -160,7 +160,7 @@ export default function Home() {
           viewport={{ once: true, amount: 0.2 }}
           className="fade-in max-w-7xl mx-auto"
         >
-          <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">
+          <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white text-center">
             Top Rated
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -181,12 +181,16 @@ export default function Home() {
                   to={`/businesses/${b.id}`}
                   className="block p-[2px] rounded-3xl bg-gradient-border transition-all duration-500"
                 >
-                  <div className="rounded-3xl bg-white/70 backdrop-blur-md p-6 hover:bg-white/80 transition-all duration-500">
-                    <h3 className="text-xl font-semibold mb-1">{b.name}</h3>
-                    <p className="text-sm text-gray-500">{b.address}</p>
+                  <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500">
+                    <h3 className="text-xl font-semibold mb-1 text-gray-900 dark:text-white">
+                      {b.name}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-white">
+                      {b.address}
+                    </p>
                     <div className="mt-3 text-sm text-yellow-500">
                       ⭐ {b.average_rating}{" "}
-                      <span className="text-gray-600">
+                      <span className="text-gray-600 dark:text-white">
                         • {b.review_count} reviews
                       </span>
                     </div>
