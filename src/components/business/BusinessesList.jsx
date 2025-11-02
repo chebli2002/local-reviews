@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useData } from "../../data/DataContext.jsx";
 import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Star } from "lucide-react";
+import { Search, Star, X } from "lucide-react";
 
 function useQuery() {
   const { search } = useLocation();
@@ -107,6 +107,66 @@ export default function BusinessesList() {
         </div>
       </motion.div>
 
+      {/* Filter Chips */}
+      {(term || cat !== "all" || sort !== "rating") && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-wrap items-center gap-2"
+        >
+          <span className="text-sm text-gray-600 dark:text-gray-300">
+            Active filters:
+          </span>
+          {term && (
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setTerm("")}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+            >
+              Search: "{term}"
+              <X className="w-3 h-3" />
+            </motion.button>
+          )}
+          {cat !== "all" && (
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setCat("all")}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+            >
+              {categories.find((c) => c.id === cat)?.name || "Category"}
+              <X className="w-3 h-3" />
+            </motion.button>
+          )}
+          {sort !== "rating" && (
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSort("rating")}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+            >
+              Sort: {sort === "reviews" ? "Reviews" : "A–Z"}
+              <X className="w-3 h-3" />
+            </motion.button>
+          )}
+        </motion.div>
+      )}
+
+      {/* Results Count */}
+      {filtered.length > 0 && (
+        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+          Showing {filtered.length}{" "}
+          {filtered.length === 1 ? "business" : "businesses"}
+        </p>
+      )}
+
       {/* Business Cards */}
       <div className="grid md:grid-cols-2 gap-8">
         {filtered.length > 0 ? (
@@ -118,11 +178,11 @@ export default function BusinessesList() {
               transition={{ delay: i * 0.05 }}
               whileHover={{
                 scale: 1.03,
-                boxShadow: "0 0 40px rgba(147, 197, 253, 0.25)",
+                boxShadow: "0 20px 60px rgba(147, 197, 253, 0.4)",
               }}
               className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border"
             >
-              <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500">
+              <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-white/85 dark:hover:bg-gray-800/85 transition-all duration-500 shadow-lg hover:shadow-2xl">
                 <div className="flex-1">
                   <Link
                     to={`/businesses/${b.id}`}
@@ -134,42 +194,93 @@ export default function BusinessesList() {
                     {b.address}
                   </p>
 
-                  <div className="mt-3 flex items-center gap-2">
+                  <div className="mt-3 flex items-center gap-3 flex-wrap">
                     <div className="flex items-center text-gray-900 dark:text-white text-base">
                       <Star
                         className={`w-4 h-4 fill-current ${
                           isDark ? "text-white" : "text-gray-900"
                         }`}
                       />
-                      <span className="ml-1">{b.average_rating}</span>
+                      <span className="ml-1 font-semibold">
+                        {b.average_rating}
+                      </span>
                     </div>
-                    <span className="text-gray-600 dark:text-gray-300 text-sm">
-                      • {b.review_count} reviews
-                    </span>
+                    {b.review_count > 0 && (
+                      <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium">
+                        {b.review_count}{" "}
+                        {b.review_count === 1 ? "review" : "reviews"}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex gap-3 items-end md:items-center justify-end">
-                  <Link
-                    to={`/businesses/${b.id}`}
-                    className="btn-outline px-4 py-2"
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    View
-                  </Link>
-                  <Link
-                    to={`/businesses/${b.id}/review`}
-                    className="btn-primary px-4 py-2"
+                    <Link
+                      to={`/businesses/${b.id}`}
+                      className="btn-outline px-4 py-2"
+                    >
+                      View
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    Review
-                  </Link>
+                    <Link
+                      to={`/businesses/${b.id}/review`}
+                      className="btn-primary px-4 py-2"
+                    >
+                      Review
+                    </Link>
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
           ))
         ) : (
-          <div className="text-gray-600 dark:text-white text-center py-10 text-lg">
-            No businesses found.
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-16"
+          >
+            <div className="max-w-md mx-auto">
+              <div className="mb-6">
+                <div className="w-24 h-24 mx-auto rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                  <Search className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                </div>
+              </div>
+              <h3
+                className="text-2xl font-bold mb-2"
+                style={{
+                  color: isDark ? "white" : "#111827",
+                }}
+              >
+                No businesses found
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Try adjusting your search or filters to find what you're looking
+                for.
+              </p>
+              {(term || cat !== "all" || sort !== "rating") && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setTerm("");
+                    setCat("all");
+                    setSort("rating");
+                  }}
+                  className="px-6 py-2 rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                >
+                  Clear All Filters
+                </motion.button>
+              )}
+            </div>
+          </motion.div>
         )}
       </div>
     </section>

@@ -34,10 +34,19 @@ export default function Navbar() {
         {/* Logo */}
         <Link
           to="/"
-          className="text-2xl font-bold text-indigo-600 dark:text-pink-300 tracking-tight drop-shadow-md"
+          className="text-2xl font-bold tracking-tight drop-shadow-md transition-colors duration-300"
+          style={{
+            color: isDark ? "#D8B4FE" : "#4F46E5",
+          }}
         >
           Local
-          <span className="text-purple-600 dark:text-purple-400">Reviews</span>
+          <span
+            style={{
+              color: isDark ? "#C084FC" : "#9333EA",
+            }}
+          >
+            Reviews
+          </span>
         </Link>
 
         {/* Navigation Links */}

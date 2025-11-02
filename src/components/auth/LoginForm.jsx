@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useData } from "../../data/DataContext.jsx";
@@ -9,6 +9,20 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,8 +45,11 @@ export default function LoginForm() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative w-full max-w-md p-[2px] rounded-3xl bg-gradient-border shadow-2xl"
       >
-        <div className="bg-white/70 backdrop-blur-md rounded-3xl p-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-3xl p-8">
+          <h1
+            className="text-3xl font-extrabold mb-6 text-center transition-colors duration-300"
+            style={{ color: isDark ? "white" : "#111827" }}
+          >
             Welcome Back
           </h1>
 
@@ -46,7 +63,7 @@ export default function LoginForm() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
                 Email or Username
               </label>
@@ -55,7 +72,7 @@ export default function LoginForm() {
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl bg-white/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                 placeholder="Enter your email or username"
               />
             </div>
@@ -63,7 +80,7 @@ export default function LoginForm() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
                 Password
               </label>
@@ -72,7 +89,7 @@ export default function LoginForm() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl bg-white/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                 placeholder="Enter your password"
               />
             </div>
@@ -86,9 +103,12 @@ export default function LoginForm() {
             </motion.button>
           </form>
 
-          <p className="text-sm text-gray-700 mt-6 text-center">
-            Don’t have an account?{" "}
-            <Link to="/register" className="text-indigo-600 hover:underline">
+          <p className="text-sm text-gray-700 dark:text-gray-300 mt-6 text-center">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-indigo-600 dark:text-indigo-400 hover:underline transition-colors"
+            >
               Register
             </Link>
           </p>

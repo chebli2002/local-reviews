@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useData } from "../../data/DataContext.jsx";
@@ -8,6 +8,20 @@ export default function WriteReviewForm() {
   const navigate = useNavigate();
   const { businesses, addReview } = useData();
   const business = businesses.find((b) => b.id === id);
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -15,7 +29,7 @@ export default function WriteReviewForm() {
 
   if (!business)
     return (
-      <div className="text-center text-gray-600 mt-20 text-lg">
+      <div className="text-center text-gray-600 dark:text-white mt-20 text-lg">
         Business not found.
       </div>
     );
@@ -45,13 +59,16 @@ export default function WriteReviewForm() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative w-full max-w-lg p-[2px] rounded-3xl bg-gradient-border shadow-2xl"
       >
-        <div className="bg-white/70 backdrop-blur-md rounded-3xl p-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-3xl p-8">
+          <h1
+            className="text-3xl font-extrabold mb-2 text-center transition-colors duration-300"
+            style={{ color: isDark ? "white" : "#111827" }}
+          >
             Write a Review
           </h1>
-          <p className="text-gray-700 mb-8 text-center">
+          <p className="text-gray-700 dark:text-gray-300 mb-8 text-center">
             for{" "}
-            <span className="font-semibold text-indigo-600">
+            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
               {business.name}
             </span>
           </p>
@@ -65,7 +82,7 @@ export default function WriteReviewForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Rating Input */}
             <div className="text-center">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Rating
               </label>
               <div className="flex justify-center gap-2">
@@ -92,7 +109,7 @@ export default function WriteReviewForm() {
             <div>
               <label
                 htmlFor="comment"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
                 Comment
               </label>
@@ -100,7 +117,7 @@ export default function WriteReviewForm() {
                 id="comment"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="w-full rounded-xl bg-white/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                 placeholder="Share your experience..."
                 rows={5}
               />
