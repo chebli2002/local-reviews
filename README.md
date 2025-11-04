@@ -1,16 +1,156 @@
-# React + Vite
+# 🌌 Codeforces – Local Business Discovery Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to **Codeforces**, a collaborative project designed to help users **discover, review, and explore** local businesses with a visually appealing Aurora-themed interface.  
+Built using **React**, **Tailwind CSS**, and **Framer Motion**, this project blends aesthetic design with functionality.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Overview
 
-## React Compiler
+**Codeforces** lets users:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Explore and search businesses by name, category, or rating
+- Read and write reviews for local businesses
+- Sort and filter business listings dynamically
+- Add new businesses through a submission form
+- Switch between light and dark modes with a floating toggle
+- Enjoy a responsive, animated interface optimized for all devices
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🧠 Tech Stack
+
+| Layer                  | Technology                      |
+| :--------------------- | :------------------------------ |
+| **Frontend Framework** | React (Vite)                    |
+| **Styling**            | Tailwind CSS                    |
+| **Animations**         | Framer Motion                   |
+| **Icons**              | Lucide React                    |
+| **State Management**   | Context API                     |
+| **Build Tool**         | Vite                            |
+| **Deployment**         | Vercel / Netlify / GitHub Pages |
+
+---
+
+📁 Project Structure
+
+node_modules/
+
+public/
+│ vite.svg
+
+src/
+├── assets/
+│ └── react.svg
+│
+├── components/
+│ ├── auth/
+│ │ ├── LoginForm.jsx # Login form component
+│ │ └── RegisterForm.jsx # Registration form
+│ │
+│ ├── business/
+│ │ ├── BusinessDetail.jsx # Displays business details & reviews
+│ │ ├── BusinessesList.jsx # List of businesses with filters & sorting
+│ │ └── BusinessForm.jsx # Add/edit business form
+│ │
+│ ├── globals/
+│ │ ├── BackToTop.jsx # Floating scroll-to-top button
+│ │ ├── DarkModeToggle.jsx # Persistent light/dark mode button
+│ │ ├── Footer.jsx # Global footer
+│ │ └── Navbar.jsx # Main navigation bar
+│ │
+│ ├── Reviews/
+│ │ ├── UserReviews.jsx # Displays user-submitted reviews
+│ │ └── WriteReviewForm.jsx # Form for adding a new review
+│ │
+│ ├── Home.jsx # Landing page (Aurora gradient hero)
+│ └── NotFound.jsx # 404 error page
+│
+├── data/
+│ └── DataContext.jsx # Global state management via Context API
+│
+├── App.css # Component-level styles
+├── App.jsx # Main routing component
+├── index.css # Tailwind global styles
+├── main.jsx # Entry point
+│
+├── .gitignore # Ignored files
+├── eslint.config.js # ESLint configuration
+├── index.html # Base HTML file
+├── package.json # Dependencies and scripts
+├── pnpm-lock.yaml # Lock file for pnpm
+├── vite.config.js # Vite configuration
+└── README.md # Project documentation
+
+---
+
+## ⚙️ Installation & Setup
+
+Follow these steps to set up **Codeforces** locally on your machine:
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Chebli2002/local-reviews.git
+cd codeforces
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Start the development server
+
+```bash
+npm run dev
+```
+
+Now open your browser and visit:  
+👉 **http://localhost:5173**
+
+---
+
+## 👥 Team Members – Codeforces
+
+| Member      | Contribution                                                                              |
+| :---------- | :---------------------------------------------------------------------------------------- |
+| **Chebli**  | Developed the Home page, Aurora animation system, and Framer Motion transitions.          |
+| **Nabil**   | Implemented the Business List layout, filtering and sorting logic, and responsive design. |
+| **John**    | Created the Login/Register authentication flow and managed app state through Context API. |
+| **Charbel** | Built the Dark Mode Toggle, Footer, and Business Detail components with refined styling.  |
+
+> Every team member collaborated closely on design, development, and debugging to deliver a seamless experience.
+
+---
+
+## ✨ Features
+
+✅ **Aurora Background UI** – A unique glowing gradient inspired by northern lights.  
+✅ **Dark/Light Mode** – Smooth toggle switch with persistent state.  
+✅ **Responsive Design** – Fully adaptive for desktop, tablet, and mobile.  
+✅ **Framer Motion Animations** – Adds polish and interactivity to every page.  
+✅ **Dynamic Filtering & Sorting** – Easily search and sort businesses by rating or category.  
+✅ **Reusable Components** – Organized structure for scalability and maintenance.  
+✅ **Custom Hooks & Context** – Streamlined global state management.
+
+---
+
+## 💡 Future Enhancements
+
+- 🌐 Integration with live APIs for real-time business data
+- 🧭 Map view to visualize nearby businesses
+- ⭐ User profiles with review history
+- 📸 Image uploads for businesses and reviews
+- 🧑‍💼 Admin dashboard for managing businesses
+
+---
+
+## 💬 Acknowledgments
+
+A heartfelt thank-you to the **Codeforces** team for their hard work and creativity.  
+Through teamwork, dedication, and innovation, we built a visually captivating and smooth user experience.
+
+> Designed and developed with ❤️ by **Codeforces** — Chebli, Nabil, John, and Charbel.  
+> Built with React, Tailwind, and Vite.
