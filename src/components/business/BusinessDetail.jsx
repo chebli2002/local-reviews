@@ -55,7 +55,9 @@ export default function BusinessDetail() {
             >
               {business.name}
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">{business.address}</p>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">
+              {business.address}
+            </p>
 
             <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               <span className="flex items-center gap-1">
@@ -100,7 +102,6 @@ export default function BusinessDetail() {
             >
               Write a Review
             </Link>
-            {/* ✅ Only owner sees edit button */}
             {currentUser && currentUser.id === business.owner_id && (
               <button
                 onClick={() => navigate(`/businesses/${business.id}/edit`)}
@@ -133,6 +134,41 @@ export default function BusinessDetail() {
           </p>
         </motion.div>
       )}
+
+      {/* ✅ Reviews Section - Visible to everyone */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-8 border border-white/50 dark:border-gray-700/50 shadow-md hover:shadow-xl transition-all duration-500"
+      >
+        <h2
+          className="text-2xl font-bold mb-4 transition-colors duration-300"
+          style={{ color: isDark ? "white" : "#111827" }}
+        >
+          Customer Reviews
+        </h2>
+
+        {bizReviews.length === 0 ? (
+          <p className="text-gray-600 dark:text-gray-300">No reviews yet.</p>
+        ) : (
+          <ul className="space-y-4">
+            {bizReviews.map((r) => (
+              <li
+                key={r.id}
+                className="p-4 rounded-xl bg-white/60 dark:bg-gray-900/50 border border-white/30 dark:border-gray-700/40 backdrop-blur-md transition-all duration-300 hover:shadow-md"
+              >
+                <p className="text-gray-900 dark:text-gray-100 text-base mb-2">
+                  {r.comment}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  — {r.user?.username || "Anonymous"} • {r.rating}★
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </motion.div>
     </section>
   );
 }
