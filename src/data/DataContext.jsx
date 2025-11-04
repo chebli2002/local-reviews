@@ -4,7 +4,6 @@ import { nanoid } from "nanoid";
 const DataContext = createContext(null);
 export const useData = () => useContext(DataContext);
 
-// Initial data (mock)
 const categoriesSeed = [
   { id: "cat-food", name: "Food & Drink" },
   { id: "cat-fitness", name: "Fitness" },
@@ -20,6 +19,7 @@ const businessesSeed = [
     phone: "555-1234",
     website: "https://sunrisecafe.local",
     category_id: "cat-food",
+    owner_id: "u1",
   },
   {
     id: "b2",
@@ -29,6 +29,7 @@ const businessesSeed = [
     phone: "555-8877",
     website: "https://ironfit.local",
     category_id: "cat-fitness",
+    owner_id: "u2",
   },
   {
     id: "b3",
@@ -38,6 +39,7 @@ const businessesSeed = [
     phone: "555-4411",
     website: "https://swiftfix.local",
     category_id: "cat-services",
+    owner_id: "u1",
   },
 ];
 
@@ -99,15 +101,23 @@ export function DataProvider({ children }) {
     }));
   }, [businesses, reviews]);
 
+  // ✅ Add business (assign owner)
   const addBusiness = (payload) => {
+    if (!currentUser) throw new Error("You must log in first.");
     const id = nanoid(6);
-    setBusinesses((prev) => [...prev, { id, ...payload }]);
+    setBusinesses((prev) => [
+      ...prev,
+      { id, owner_id: currentUser.id, ...payload },
+    ]);
     return id;
   };
 
+  // ✅ Update business (only owner can edit)
   const updateBusiness = (id, payload) => {
     setBusinesses((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, ...payload } : b))
+      prev.map((b) =>
+        b.id === id && b.owner_id === currentUser?.id ? { ...b, ...payload } : b
+      )
     );
   };
 

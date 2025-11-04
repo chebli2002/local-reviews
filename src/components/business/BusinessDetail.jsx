@@ -41,7 +41,6 @@ export default function BusinessDetail() {
 
   return (
     <section className="max-w-4xl mx-auto px-6 py-14 space-y-10">
-      {/* HEADER CARD */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -101,7 +100,8 @@ export default function BusinessDetail() {
             >
               Write a Review
             </Link>
-            {currentUser && (
+            {/* ✅ Only owner sees edit button */}
+            {currentUser && currentUser.id === business.owner_id && (
               <button
                 onClick={() => navigate(`/businesses/${business.id}/edit`)}
                 className="btn-outline text-base"
@@ -111,12 +111,10 @@ export default function BusinessDetail() {
             )}
           </div>
 
-          {/* Accent gradient overlay */}
           <div className="absolute inset-0 rounded-3xl opacity-0 hover:opacity-100 transition-opacity duration-700 bg-gradient-to-r from-indigo-400/10 via-purple-400/20 to-pink-300/10 pointer-events-none"></div>
         </div>
       </motion.div>
 
-      {/* ABOUT SECTION */}
       {business.description && (
         <motion.div
           initial={{ opacity: 0, y: 25 }}
@@ -135,70 +133,6 @@ export default function BusinessDetail() {
           </p>
         </motion.div>
       )}
-
-      {/* REVIEWS SECTION */}
-      <motion.div
-        initial={{ opacity: 0, y: 25 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="space-y-5"
-      >
-        <h2
-          className="text-3xl font-extrabold mb-4 transition-colors duration-300"
-          style={{ color: isDark ? "white" : "#111827" }}
-        >
-          Reviews
-        </h2>
-
-        {bizReviews.length > 0 ? (
-          <div className="space-y-5">
-            {bizReviews.map((r, i) => (
-              <motion.div
-                key={r.id}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="relative overflow-hidden p-[2px] rounded-3xl bg-gradient-border"
-              >
-                <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500">
-                  <div className="flex justify-between items-start mb-1">
-                    <div>
-                      <div
-                        className="font-semibold text-lg transition-colors duration-300"
-                        style={{ color: isDark ? "white" : "#111827" }}
-                      >
-                        {r.user?.username ?? "Anonymous"}
-                      </div>
-                      <div
-                        className="text-sm font-medium flex items-center gap-1 transition-colors duration-300"
-                        style={{ color: isDark ? "white" : "#111827" }}
-                      >
-                        <Star
-                          className={`w-4 h-4 fill-current ${
-                            isDark ? "text-white" : "text-gray-900"
-                          }`}
-                        />
-                        {r.rating} / 5
-                      </div>
-                    </div>
-                    <div className="text-gray-400 dark:text-gray-500 text-xs">
-                      {new Date().toLocaleDateString()}
-                    </div>
-                  </div>
-                  <p className="mt-3 text-gray-700 dark:text-gray-300 leading-relaxed text-base">
-                    {r.comment}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-8 text-gray-600 dark:text-gray-300 text-center text-lg border border-white/50 dark:border-gray-700/50">
-            No reviews yet. Be the first to share your thoughts!
-          </div>
-        )}
-      </motion.div>
     </section>
   );
 }
