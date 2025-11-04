@@ -1,104 +1,194 @@
 # 🌌 Codeforces – Local Business Discovery Platform
 
-Welcome to **Codeforces**, a collaborative project designed to help users **discover, review, and explore** local businesses with a visually appealing Aurora-themed interface.  
-Built using **React**, **Tailwind CSS**, and **Framer Motion**, this project blends aesthetic design with functionality.
+Welcome to **Codeforces**, a collaborative project built for **CSC443 – Project 1**.  
+This web application allows users to **discover, review, and explore** local businesses in a beautifully designed, Aurora-themed environment.
 
 ---
 
 ## 🚀 Overview
 
-**Codeforces** lets users:
+**Codeforces** enables users to:
 
-- Explore and search businesses by name, category, or rating
-- Read and write reviews for local businesses
-- Sort and filter business listings dynamically
-- Add new businesses through a submission form
-- Switch between light and dark modes with a floating toggle
-- Enjoy a responsive, animated interface optimized for all devices
+- Browse and search for local businesses by name, category, or rating.
+- Read and submit reviews for businesses.
+- Add new businesses through a responsive form.
+- Filter and sort businesses dynamically.
+- Enjoy an elegant **Aurora gradient design**, smooth animations, and a **dark/light theme toggle**.
+- Experience full interactivity using React Hooks and Context API.
 
 ---
 
 ## 🧠 Tech Stack
 
-| Layer                  | Technology                      |
-| :--------------------- | :------------------------------ |
-| **Frontend Framework** | React (Vite)                    |
-| **Styling**            | Tailwind CSS                    |
-| **Animations**         | Framer Motion                   |
-| **Icons**              | Lucide React                    |
-| **State Management**   | Context API                     |
-| **Build Tool**         | Vite                            |
-| **Deployment**         | Vercel / Netlify / GitHub Pages |
+| Layer                  | Technology       |
+| :--------------------- | :--------------- |
+| **Frontend Framework** | React (Vite)     |
+| **Styling**            | Tailwind CSS     |
+| **Animations**         | Framer Motion    |
+| **Icons**              | Lucide React     |
+| **Routing**            | React Router     |
+| **State Management**   | Context API      |
+| **Deployment**         | Vercel / Netlify |
+| **Build Tool**         | Vite             |
 
 ---
 
 ## ⚙️ Installation & Setup
 
-Follow these steps to set up **Codeforces** locally on your machine:
+Follow these steps to run the project locally:
 
-### 1. Clone the repository
+1️⃣ Clone the repository  
+git clone https://github.com/yourusername/codeforces-localreviews.git  
+cd codeforces-localreviews
 
-```bash
-git clone https://github.com/Chebli2002/local-reviews.git
-cd codeforces
-```
-
-### 2. Install dependencies
-
-```bash
+2️⃣ Install dependencies  
 npm install
-```
 
-### 3. Start the development server
+# or
 
-```bash
+pnpm install
+
+3️⃣ Run the development server  
 npm run dev
-```
 
-Now open your browser and visit:  
-👉 **http://localhost:5173**
-
----
-
-## 👥 Team Members – Codeforces
-
-| Member      | Contribution                                                                              |
-| :---------- | :---------------------------------------------------------------------------------------- |
-| **Chebli**  | Developed the Home page, Aurora animation system, and Framer Motion transitions.          |
-| **Nabil**   | Implemented the Business List layout, filtering and sorting logic, and responsive design. |
-| **John**    | Created the Login/Register authentication flow and managed app state through Context API. |
-| **Charbel** | Built the Dark Mode Toggle, Footer, and Business Detail components with refined styling.  |
-
-> Every team member collaborated closely on design, development, and debugging to deliver a seamless experience.
+4️⃣ Open the app  
+Visit http://localhost:5173 in your browser.
 
 ---
 
-## ✨ Features
+## 🌍 Deployment
 
-✅ **Aurora Background UI** – A unique glowing gradient inspired by northern lights.  
-✅ **Dark/Light Mode** – Smooth toggle switch with persistent state.  
-✅ **Responsive Design** – Fully adaptive for desktop, tablet, and mobile.  
-✅ **Framer Motion Animations** – Adds polish and interactivity to every page.  
-✅ **Dynamic Filtering & Sorting** – Easily search and sort businesses by rating or category.  
-✅ **Reusable Components** – Organized structure for scalability and maintenance.  
-✅ **Custom Hooks & Context** – Streamlined global state management.
+You can deploy this project easily using:
 
----
+- Vercel (recommended): https://vercel.com/new
+- Netlify: https://app.netlify.com/start
+- GitHub Pages (via gh-pages)
 
-## 💡 Future Enhancements
-
-- 🌐 Integration with live APIs for real-time business data
-- 🧭 Map view to visualize nearby businesses
-- ⭐ User profiles with review history
-- 📸 Image uploads for businesses and reviews
-- 🧑‍💼 Admin dashboard for managing businesses
+Make sure your build command is:
+npm run build  
+and your output directory is:
+dist
 
 ---
 
-## 💬 Acknowledgments
+## 🧩 Data Entities & Mock Data
 
-A heartfelt thank-you to the **Codeforces** team for their hard work and creativity.  
-Through teamwork, dedication, and innovation, we built a visually captivating and smooth user experience.
+This project uses mock data (no backend) to simulate full CRUD functionality.  
+All entities and interactions are handled using React Context and useState.
 
-> Designed and developed with ❤️ by **Codeforces** — Chebli, Nabil, John, and Charbel.  
-> Built with React, Tailwind, and Vite.
+| Entity     | Description                                                                                                         |
+| :--------- | :------------------------------------------------------------------------------------------------------------------ |
+| Users      | Represent people who log in, register, and post reviews.                                                            |
+| Businesses | Contain details such as name, description, address, phone, and category. Each business is owned by a specific user. |
+| Categories | Define the business type (e.g., Food, Fitness, Services).                                                           |
+| Reviews    | Store ratings and comments for each business.                                                                       |
+
+Example of Mock Data (in DataContext.jsx):
+
+const reviewsSeed = [
+{ id: "r1", user_id: "u1", business_id: "b1", rating: 5, comment: "Amazing coffee and friendly staff!" },
+{ id: "r2", user_id: "u2", business_id: "b1", rating: 4, comment: "Nice croissants and chill vibe." },
+{ id: "r3", user_id: "u2", business_id: "b2", rating: 3, comment: "Good gym but too crowded." },
+];
+
+These reviews load automatically on startup and can be filtered or added dynamically through the interface.
+
+---
+
+## ✨ Key Features
+
+✅ Dynamic Aurora Background  
+A continuously animated gradient background built with Tailwind and Framer Motion.
+
+✅ Dark/Light Mode  
+Persistent theme toggle that adapts the Aurora effect for each mode.
+
+✅ Owner-Only Business Editing  
+Businesses can only be edited by the user who created them, ensuring proper ownership logic.
+
+✅ Public Reviews  
+Reviews are visible to everyone, regardless of login status.
+
+✅ Fully Responsive  
+Every page and component is mobile-friendly and adjusts seamlessly to different viewports.
+
+✅ Futuristic Animations  
+Page transitions, card hovers, and smooth content reveals using Framer Motion.
+
+---
+
+## 🧑‍💻 Team Codeforces
+
+| Member  | Contribution                                                                                                             |
+| :------ | :----------------------------------------------------------------------------------------------------------------------- |
+| Chebli  | Designed the homepage (Aurora animation, hero transitions), implemented dark/light mode logic, and aesthetic components. |
+| Nabil   | Developed authentication pages (Login & Register), and implemented the ownership logic for businesses.                   |
+| John    | Built the BusinessList and BusinessDetail components, integrated reviews, and optimized responsive design.               |
+| Charbel | Connected all routes, handled Context API state, footer logic, and final debugging & deployment setup.                   |
+
+---
+
+## 🧠 Functionality Summary
+
+- Home Page: Dynamic hero with Aurora effects and category animations.
+- All Businesses: Displays all business cards with filters and sorting.
+- Business Details: Shows detailed info and customer reviews.
+- Add/Edit Business: Allows authenticated users to manage their listings.
+- Review System: Authenticated users can write reviews visible to everyone.
+- Login & Register: Fully functional mock authentication.
+- Dark/Light Mode: Smooth persistent theme switching.
+- Responsive Design: Mobile, tablet, and desktop layouts supported.
+
+---
+
+## 💾 Data Persistence
+
+Currently, data (users, businesses, reviews) is stored in memory using useState.  
+Optional enhancement: enable persistence using localStorage for data retention after refresh.
+
+---
+
+## 🧮 Evaluation Checklist
+
+| Requirement                         | Status |
+| ----------------------------------- | ------ |
+| React Functional Components & Hooks | ✅     |
+| Routing with React Router           | ✅     |
+| Context API State Management        | ✅     |
+| Tailwind CSS Styling                | ✅     |
+| Dynamic Filtering & Search          | ✅     |
+| CRUD Simulation                     | ✅     |
+| Theme Toggle                        | ✅     |
+| Accessibility & Responsiveness      | ✅     |
+| Code Quality & Comments             | ✅     |
+
+---
+
+## 📸 Screenshots
+
+Please check the screenshots below:
+/screenshots/
+├── homepage-light.png
+├── homepage-dark.png
+├── business-list.png
+└── review-section.png
+
+---
+
+## 🏁 Deployment Link
+
+Live Demo: https://local-reviews.vercel.app/
+GitHub Repository: https://github.com/chebli2002/local-reviews.git
+
+---
+
+## 🧾 Notes for the Instructor
+
+- All logic and design were implemented from scratch by the Codeforces team.
+- No external APIs or databases were used — only mock data.
+- The app fulfills CSC443 Project 1 technical and aesthetic criteria, demonstrating modular, animated, and responsive React development.
+
+---
+
+✨ Created with pride by Team Codeforces (Chebli, Nabil, John, Charbel)  
+Aurora meets functionality — where beauty and logic collide.
