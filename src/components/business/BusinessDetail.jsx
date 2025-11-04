@@ -26,7 +26,6 @@ export default function BusinessDetail() {
 
   return (
     <section className="max-w-4xl mx-auto px-6 py-14 space-y-10">
-      {/* HEADER CARD */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -76,7 +75,8 @@ export default function BusinessDetail() {
             >
               Write a Review
             </Link>
-            {currentUser && (
+            {/* ✅ Only owner sees edit button */}
+            {currentUser && currentUser.id === business.owner_id && (
               <button
                 onClick={() => navigate(`/businesses/${business.id}/edit`)}
                 className="btn-outline text-base"
@@ -86,12 +86,10 @@ export default function BusinessDetail() {
             )}
           </div>
 
-          {/* Accent gradient overlay */}
           <div className="absolute inset-0 rounded-3xl opacity-0 hover:opacity-100 transition-opacity duration-700 bg-gradient-to-r from-indigo-400/10 via-purple-400/20 to-pink-300/10 pointer-events-none"></div>
         </div>
       </motion.div>
 
-      {/* ABOUT SECTION */}
       {business.description && (
         <motion.div
           initial={{ opacity: 0, y: 25 }}
@@ -107,55 +105,6 @@ export default function BusinessDetail() {
           </p>
         </motion.div>
       )}
-
-      {/* REVIEWS SECTION */}
-      <motion.div
-        initial={{ opacity: 0, y: 25 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="space-y-5"
-      >
-        <h2 className="text-3xl font-extrabold text-gray-900 mb-4">Reviews</h2>
-
-        {bizReviews.length > 0 ? (
-          <div className="space-y-5">
-            {bizReviews.map((r, i) => (
-              <motion.div
-                key={r.id}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="relative overflow-hidden p-[2px] rounded-3xl bg-gradient-border"
-              >
-                <div className="rounded-3xl bg-white/70 backdrop-blur-md p-6 hover:bg-white/80 transition-all duration-500">
-                  <div className="flex justify-between items-start mb-1">
-                    <div>
-                      <div className="font-semibold text-gray-900 text-lg">
-                        {r.user?.username ?? "Anonymous"}
-                      </div>
-                      <div className="text-sm text-gray-900 font-medium flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-current text-gray-900" />
-                        {r.rating} / 5
-                      </div>
-                    </div>
-                    <div className="text-gray-400 text-xs">
-                      {new Date().toLocaleDateString()}
-                    </div>
-                  </div>
-                  <p className="mt-3 text-gray-700 leading-relaxed text-base">
-                    {r.comment}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-3xl bg-white/70 backdrop-blur-md p-8 text-gray-600 text-center text-lg border border-white/50">
-            No reviews yet. Be the first to share your thoughts!
-          </div>
-        )}
-      </motion.div>
     </section>
   );
 }

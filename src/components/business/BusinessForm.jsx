@@ -6,7 +6,13 @@ import { useData } from "../../data/DataContext.jsx";
 export default function BusinessForm({ isEdit = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { categories, rawBusinesses, addBusiness, updateBusiness } = useData();
+  const {
+    categories,
+    rawBusinesses,
+    addBusiness,
+    updateBusiness,
+    currentUser,
+  } = useData();
 
   const existing = rawBusinesses.find((b) => b.id === id);
   const [form, setForm] = useState({
@@ -35,7 +41,17 @@ export default function BusinessForm({ isEdit = false }) {
       return;
     }
 
+    if (!currentUser) {
+      setError("You must be logged in to make changes.");
+      return;
+    }
+
+    // ✅ Ownership check
     if (isEdit && existing) {
+      if (existing.owner_id !== currentUser.id) {
+        setError("You are not authorized to edit this business.");
+        return;
+      }
       updateBusiness(existing.id, form);
       navigate(`/businesses/${existing.id}`);
     } else {
@@ -154,7 +170,6 @@ export default function BusinessForm({ isEdit = false }) {
               </div>
             </div>
 
-            {/* Submit */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
