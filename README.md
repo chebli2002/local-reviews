@@ -32,58 +32,6 @@ Built using **React**, **Tailwind CSS**, and **Framer Motion**, this project ble
 
 ---
 
-📁 Project Structure
-
-node_modules/
-
-public/
-│ vite.svg
-
-src/
-├── assets/
-│ └── react.svg
-│
-├── components/
-│ ├── auth/
-│ │ ├── LoginForm.jsx # Login form component
-│ │ └── RegisterForm.jsx # Registration form
-│ │
-│ ├── business/
-│ │ ├── BusinessDetail.jsx # Displays business details & reviews
-│ │ ├── BusinessesList.jsx # List of businesses with filters & sorting
-│ │ └── BusinessForm.jsx # Add/edit business form
-│ │
-│ ├── globals/
-│ │ ├── BackToTop.jsx # Floating scroll-to-top button
-│ │ ├── DarkModeToggle.jsx # Persistent light/dark mode button
-│ │ ├── Footer.jsx # Global footer
-│ │ └── Navbar.jsx # Main navigation bar
-│ │
-│ ├── Reviews/
-│ │ ├── UserReviews.jsx # Displays user-submitted reviews
-│ │ └── WriteReviewForm.jsx # Form for adding a new review
-│ │
-│ ├── Home.jsx # Landing page (Aurora gradient hero)
-│ └── NotFound.jsx # 404 error page
-│
-├── data/
-│ └── DataContext.jsx # Global state management via Context API
-│
-├── App.css # Component-level styles
-├── App.jsx # Main routing component
-├── index.css # Tailwind global styles
-├── main.jsx # Entry point
-│
-├── .gitignore # Ignored files
-├── eslint.config.js # ESLint configuration
-├── index.html # Base HTML file
-├── package.json # Dependencies and scripts
-├── pnpm-lock.yaml # Lock file for pnpm
-├── vite.config.js # Vite configuration
-└── README.md # Project documentation
-
----
-
 ## ⚙️ Installation & Setup
 
 Follow these steps to set up **Codeforces** locally on your machine:
