@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useData } from "./data/DataContext.jsx";
 import Navbar from "./components/globals/Navbar.jsx";
 import DarkModeToggle from "./components/globals/DarkModeToggle.jsx";
+import BackToTop from "./components/globals/BackToTop.jsx";
 import Home from "./components/Home.jsx";
 import BusinessesList from "./components/business/BusinessesList.jsx";
 import BusinessDetail from "./components/business/BusinessDetail.jsx";
@@ -72,6 +73,7 @@ export default function App() {
       </AnimatePresence>
       <Footer />
       <DarkModeToggle />
+      <BackToTop />
     </div>
   );
 }

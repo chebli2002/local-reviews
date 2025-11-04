@@ -68,8 +68,11 @@ export default function BusinessForm({ isEdit = false }) {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative w-full max-w-2xl p-[2px] rounded-3xl bg-gradient-border shadow-2xl"
       >
-        <div className="bg-white/70 backdrop-blur-md rounded-3xl p-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-3xl p-8">
+          <h1
+            className="text-3xl font-extrabold mb-6 text-center transition-colors duration-300"
+            style={{ color: isDark ? "white" : "#111827" }}
+          >
             {isEdit ? "Edit Business" : "Add New Business"}
           </h1>
 
@@ -82,21 +85,21 @@ export default function BusinessForm({ isEdit = false }) {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Name *
               </label>
               <input
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                className="w-full rounded-xl bg-white/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                 placeholder="Enter business name"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Description
               </label>
               <textarea
@@ -104,7 +107,7 @@ export default function BusinessForm({ isEdit = false }) {
                 value={form.description}
                 onChange={handleChange}
                 rows={3}
-                className="w-full rounded-xl bg-white/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                 placeholder="Write a short description..."
               />
             </div>
@@ -112,26 +115,26 @@ export default function BusinessForm({ isEdit = false }) {
             {/* Address + Phone */}
             <div className="grid sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Address *
                 </label>
                 <input
                   name="address"
                   value={form.address}
                   onChange={handleChange}
-                  className="w-full rounded-xl bg-white/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                  className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                   placeholder="Enter business address"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Phone
                 </label>
                 <input
                   name="phone"
                   value={form.phone}
                   onChange={handleChange}
-                  className="w-full rounded-xl bg-white/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                  className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                   placeholder="Optional phone number"
                 />
               </div>
@@ -140,26 +143,26 @@ export default function BusinessForm({ isEdit = false }) {
             {/* Website + Category */}
             <div className="grid sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Website
                 </label>
                 <input
                   name="website"
                   value={form.website}
                   onChange={handleChange}
-                  className="w-full rounded-xl bg-white/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                  className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                   placeholder="https://example.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Category
                 </label>
                 <select
                   name="category_id"
                   value={form.category_id}
                   onChange={handleChange}
-                  className="w-full rounded-xl bg-white/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 px-4 py-3 text-gray-900 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                  className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>

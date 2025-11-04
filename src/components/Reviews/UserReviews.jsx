@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
@@ -6,6 +7,20 @@ import { useData } from "../../data/DataContext.jsx";
 export default function UserReviews() {
   const { id } = useParams();
   const { users, getUserReviews, businesses } = useData();
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   const user = users.find((u) => u.id === id);
   const reviews = getUserReviews(id).map((r) => ({
@@ -15,7 +30,7 @@ export default function UserReviews() {
 
   if (!user)
     return (
-      <div className="text-center text-gray-600 mt-20 text-lg">
+      <div className="text-center text-gray-600 dark:text-white mt-20 text-lg">
         User not found.
       </div>
     );
@@ -28,13 +43,16 @@ export default function UserReviews() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="max-w-4xl w-full text-center"
       >
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+        <h1
+          className="text-4xl font-extrabold mb-2 transition-colors duration-300"
+          style={{ color: isDark ? "white" : "#111827" }}
+        >
           Reviews by{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
             {user.username}
           </span>
         </h1>
-        <p className="text-gray-700 text-lg mb-10">
+        <p className="text-gray-700 dark:text-gray-300 text-lg mb-10">
           See what {user.username} thinks about local businesses.
         </p>
       </motion.div>
@@ -59,25 +77,32 @@ export default function UserReviews() {
               }}
               className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border shadow-md"
             >
-              <div className="rounded-3xl bg-white/70 backdrop-blur-md p-6 h-full flex flex-col justify-between hover:bg-white/80 transition-all duration-500">
+              <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 h-full flex flex-col justify-between hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500">
                 <div className="flex justify-between items-center mb-2">
                   <Link
                     to={`/businesses/${r.business_id}`}
-                    className="text-xl font-semibold text-indigo-700 hover:text-indigo-800 transition-colors"
+                    className="text-xl font-semibold text-indigo-700 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
                   >
                     {r.business?.name ?? "Business"}
                   </Link>
-                  <div className="text-gray-900 font-medium text-lg flex items-center gap-1">
-                    <Star className="w-5 h-5 fill-current text-gray-900" />
+                  <div
+                    className="font-medium text-lg flex items-center gap-1 transition-colors duration-300"
+                    style={{ color: isDark ? "white" : "#111827" }}
+                  >
+                    <Star
+                      className={`w-5 h-5 fill-current ${
+                        isDark ? "text-white" : "text-gray-900"
+                      }`}
+                    />
                     {r.rating}
                   </div>
                 </div>
 
-                <p className="text-gray-700 leading-relaxed text-base mb-4">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base mb-4">
                   {r.comment}
                 </p>
 
-                <div className="text-sm text-gray-500 italic text-right">
+                <div className="text-sm text-gray-500 dark:text-gray-400 italic text-right">
                   {new Date().toLocaleDateString()}
                 </div>
               </div>
@@ -89,7 +114,7 @@ export default function UserReviews() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="text-gray-600 bg-white/70 backdrop-blur-md border border-white/50 rounded-3xl shadow-md px-8 py-10 text-center max-w-lg"
+          className="text-gray-600 dark:text-gray-300 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border border-white/50 dark:border-gray-700/50 rounded-3xl shadow-md px-8 py-10 text-center max-w-lg"
         >
           No reviews yet. Start sharing your experiences!
         </motion.div>
