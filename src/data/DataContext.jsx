@@ -20,6 +20,19 @@ const businessesSeed = [
     website: "https://sunrisecafe.local",
     category_id: "cat-food",
     owner_id: "u1",
+    heroImage:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=900&q=80",
+    ],
+    highlights: ["Pour-over coffee", "Local pastries", "Sunny workspace"],
+    hours: {
+      weekdays: "6:30 AM – 6:00 PM",
+      weekend: "7:00 AM – 4:00 PM",
+    },
+    mapEmbed:
+      "https://maps.google.com/maps?q=Market%20Street%20San%20Francisco&t=&z=13&ie=UTF8&iwloc=&output=embed",
   },
   {
     id: "b2",
@@ -30,6 +43,19 @@ const businessesSeed = [
     website: "https://ironfit.local",
     category_id: "cat-fitness",
     owner_id: "u2",
+    heroImage:
+      "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=1600&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?auto=format&fit=crop&w=900&q=80",
+    ],
+    highlights: ["24/7 access", "Group classes", "Certified trainers"],
+    hours: {
+      weekdays: "Open 24 hours",
+      weekend: "Open 24 hours",
+    },
+    mapEmbed:
+      "https://maps.google.com/maps?q=Fitness%20Ave%20Los%20Angeles&t=&z=13&ie=UTF8&iwloc=&output=embed",
   },
   {
     id: "b3",
@@ -40,6 +66,19 @@ const businessesSeed = [
     website: "https://swiftfix.local",
     category_id: "cat-services",
     owner_id: "u1",
+    heroImage:
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80",
+    ],
+    highlights: ["Same-day turnaround", "Certified technicians", "1-year warranty"],
+    hours: {
+      weekdays: "9:00 AM – 7:00 PM",
+      weekend: "10:00 AM – 4:00 PM",
+    },
+    mapEmbed:
+      "https://maps.google.com/maps?q=Tech%20Park%20Austin&t=&z=13&ie=UTF8&iwloc=&output=embed",
   },
 ];
 
@@ -107,7 +146,18 @@ export function DataProvider({ children }) {
     const id = nanoid(6);
     setBusinesses((prev) => [
       ...prev,
-      { id, owner_id: currentUser.id, ...payload },
+      {
+        ...{
+          gallery: [],
+          highlights: [],
+          hours: {},
+          heroImage: "",
+          mapEmbed: "",
+        },
+        ...payload,
+        id,
+        owner_id: currentUser.id,
+      },
     ]);
     return id;
   };
