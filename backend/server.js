@@ -4,6 +4,7 @@ import cors from "cors";
 import morgan from "morgan";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import businessRoutes from "./routes/businessRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/businesses", businessRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
