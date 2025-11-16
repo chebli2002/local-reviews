@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useData } from "../../data/DataContext.jsx";
+import { twMerge } from "tailwind-merge";
 
 export default function Navbar() {
   const { currentUser, logout } = useData();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // 🌓 Watch for dark mode toggle dynamically
   useEffect(() => {
@@ -22,6 +25,30 @@ export default function Navbar() {
     });
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
+  const alwaysVisibleLinks = [
+    { to: "/businesses", label: "All Businesses" },
+    { to: "/businesses/new", label: "List your business" },
+    { to: "/about", label: "About us" },
+  ];
+
+  const authDependentLinks = currentUser
+    ? [{ to: `/users/${currentUser.id}/reviews`, label: "My Reviews" }]
+    : [
+        { to: "/login", label: "Log in" },
+        { to: "/register", label: "Register" },
+      ];
+
+  const navigationLinks = [...alwaysVisibleLinks, ...authDependentLinks];
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <header
@@ -49,104 +76,103 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Navigation Links */}
-        <nav className="flex items-center gap-6 transition-colors duration-300">
-          <NavLink
-            to="/businesses"
-            className="transition-colors duration-300"
-            style={{
-              color: isDark ? "#F3F4F6" : "#111827",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.color = isDark ? "#F3F4F6" : "#111827";
-            }}
+        <div className="flex items-center gap-4">
+          {/* Desktop Navigation */}
+          <nav
+            className="hidden lg:flex items-center gap-6 transition-colors duration-300"
+            aria-label="Primary navigation"
           >
-            All Businesses
-          </NavLink>
+            {navigationLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  twMerge(
+                    "transition-colors duration-300 font-medium text-base",
+                    isActive
+                      ? "text-indigo-600! dark:text-pink-300"
+                      : "text-slate-900! dark:text-gray-100 hover:text-indigo-500 dark:hover:text-pink-200"
+                  )
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+            {currentUser && (
+              <button
+                onClick={handleLogout}
+                className="btn-primary px-3 py-1 text-sm shadow-sm"
+              >
+                Logout ({currentUser.username})
+              </button>
+            )}
+          </nav>
 
+          {/* Mobile Menu Button */}
+          <button
+            type="button"
+            className="lg:hidden inline-flex items-center justify-center rounded-md border border-white/40 dark:border-purple-900/50 p-2 text-slate-900 dark:text-gray-100 hover:bg-white/20 dark:hover:bg-purple-900/30 transition-all duration-300"
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-nav"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+          >
+            <span className="sr-only">Open main menu</span>
+            <span className="relative flex flex-col gap-1.5">
+              <span
+                className={`h-0.5 w-6 bg-current transition-transform duration-300 ${
+                  isMenuOpen ? "translate-y-1.5 rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`h-0.5 w-6 bg-current transition-opacity duration-300 ${
+                  isMenuOpen ? "opacity-0" : "opacity-100"
+                }`}
+              />
+              <span
+                className={`h-0.5 w-6 bg-current transition-transform duration-300 ${
+                  isMenuOpen ? "-translate-y-1.5 -rotate-45" : ""
+                }`}
+              />
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      <div
+        id="mobile-nav"
+        className={`lg:hidden overflow-hidden border-t border-white/20 dark:border-purple-900/40 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md shadow-lg transition-[max-height] duration-300 ${
+          isMenuOpen ? "max-h-[480px]" : "max-h-0"
+        }`}
+        aria-hidden={!isMenuOpen}
+      >
+        <div className="px-6 py-4 flex flex-col gap-3">
+          {navigationLinks.map((link) => (
+            <NavLink
+              key={`mobile-${link.to}`}
+              to={link.to}
+              className={({ isActive }) =>
+                twMerge(
+                  "transition-colors duration-300 font-medium text-lg",
+                  isActive
+                    ? "text-indigo-600 dark:text-pink-300"
+                    : "text-slate-900 dark:text-gray-100 hover:text-indigo-500 dark:hover:text-pink-200"
+                )
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
           {currentUser && (
-            <>
-              <NavLink
-                to="/businesses/new"
-                className="transition-colors duration-300"
-                style={{
-                  color: isDark ? "#F3F4F6" : "#111827",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = isDark ? "#F3F4F6" : "#111827";
-                }}
-              >
-                Add Business
-              </NavLink>
-              <NavLink
-                to={`/users/${currentUser.id}/reviews`}
-                className="transition-colors duration-300"
-                style={{
-                  color: isDark ? "#F3F4F6" : "#111827",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = isDark ? "#F3F4F6" : "#111827";
-                }}
-              >
-                My Reviews
-              </NavLink>
-            </>
-          )}
-
-          {!currentUser ? (
-            <>
-              <NavLink
-                to="/login"
-                className="transition-colors duration-300"
-                style={{
-                  color: isDark ? "#F3F4F6" : "#111827",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = isDark ? "#F3F4F6" : "#111827";
-                }}
-              >
-                Log in
-              </NavLink>
-              <NavLink
-                to="/register"
-                className="transition-colors duration-300"
-                style={{
-                  color: isDark ? "#F3F4F6" : "#111827",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = isDark ? "#F9A8D4" : "#4F46E5";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = isDark ? "#F3F4F6" : "#111827";
-                }}
-              >
-                Register
-              </NavLink>
-            </>
-          ) : (
             <button
-              onClick={() => {
-                logout();
-                navigate("/");
-              }}
-              className="btn-primary px-3 py-1 text-sm shadow-sm"
+              onClick={handleLogout}
+              className="btn-primary w-full px-4 py-2 text-sm shadow-sm"
             >
               Logout ({currentUser.username})
             </button>
           )}
-        </nav>
+        </div>
       </div>
     </header>
   );
