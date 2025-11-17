@@ -2,7 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useData } from "../../data/DataContext.jsx";
 import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Star, X } from "lucide-react";
+import { Search, X } from "lucide-react";
+import RatingStars from "./RatingStars.jsx";
 
 function useQuery() {
   const { search } = useLocation();
@@ -195,16 +196,11 @@ export default function BusinessesList() {
                   </p>
 
                   <div className="mt-3 flex items-center gap-3 flex-wrap">
-                    <div className="flex items-center text-gray-900 dark:text-white text-base">
-                      <Star
-                        className={`w-4 h-4 fill-current ${
-                          isDark ? "text-white" : "text-gray-900"
-                        }`}
-                      />
-                      <span className="ml-1 font-semibold">
-                        {b.average_rating}
-                      </span>
-                    </div>
+                    <RatingStars
+                      rating={b.average_rating}
+                      size={16}
+                      className="text-gray-900 dark:text-white"
+                    />
                     {b.review_count > 0 && (
                       <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium">
                         {b.review_count}{" "}

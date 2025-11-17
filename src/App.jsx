@@ -14,6 +14,7 @@ import LoginForm from "./components/auth/LoginForm.jsx";
 import RegisterForm from "./components/auth/RegisterForm.jsx";
 import NotFound from "./components/NotFound.jsx";
 import Footer from "./components/globals/Footer.jsx";
+import About from "./components/About.jsx";
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useData();
@@ -67,6 +68,7 @@ export default function App() {
             <Route path="/users/:id/reviews" element={<UserReviews />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
+            <Route path="/about" element={<About />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </motion.main>
