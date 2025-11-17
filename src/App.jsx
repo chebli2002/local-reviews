@@ -15,6 +15,7 @@ import RegisterForm from "./components/auth/RegisterForm.jsx";
 import NotFound from "./components/NotFound.jsx";
 import Footer from "./components/globals/Footer.jsx";
 import About from "./components/About.jsx";
+import MyBusinesses from "./components/business/MyBusinesses.jsx";
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useData();
@@ -65,6 +66,15 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/my-businesses"
+              element={
+                <ProtectedRoute>
+                  <MyBusinesses />
+                </ProtectedRoute>
+              }
+            />
+
             <Route path="/users/:id/reviews" element={<UserReviews />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
