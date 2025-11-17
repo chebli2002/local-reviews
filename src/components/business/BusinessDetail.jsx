@@ -16,7 +16,7 @@ export default function BusinessDetail() {
     document.documentElement.classList.contains("dark")
   );
 
-  // Watch dark mode changes (your original logic)
+  // Watch dark mode changes
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -28,7 +28,7 @@ export default function BusinessDetail() {
     return () => observer.disconnect();
   }, []);
 
-  // 🔥 Reviews loaded from backend
+  // Reviews loaded from backend
   const [bizReviews, setBizReviews] = useState([]);
 
   useEffect(() => {
