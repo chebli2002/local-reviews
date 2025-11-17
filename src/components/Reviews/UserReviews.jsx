@@ -6,11 +6,18 @@ import { useData } from "../../data/DataContext.jsx";
 
 export default function UserReviews() {
   const { id } = useParams();
-  const { users, getUserReviews, businesses } = useData();
+  const { users, businesses } = useData();
+
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
 
+  // 🔐 backend-powered reviews
+  const [backendReviews, setBackendReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // watch dark mode changes (your original code)
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -23,10 +30,53 @@ export default function UserReviews() {
   }, []);
 
   const user = users.find((u) => u.id === id);
-  const reviews = getUserReviews(id).map((r) => ({
-    ...r,
-    business: businesses.find((b) => b.id === r.business_id),
-  }));
+
+  // 🔄 load reviews for this user from backend
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const res = await fetch(`http://localhost:5000/api/reviews/user/${id}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || "Failed to load reviews");
+        }
+
+        // attach business info so the JSX can use r.business?.name
+        const merged = data.map((r) => {
+          const businessId =
+            typeof r.business === "object" && r.business !== null
+              ? r.business._id
+              : r.business;
+
+          return {
+            ...r,
+            business_id: businessId,
+            business:
+              businesses.find((b) => b.id === businessId) ?? r.business ?? null,
+          };
+        });
+
+        setBackendReviews(merged);
+      } catch (err) {
+        setError(err.message || "Failed to load reviews");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (user) {
+      fetchReviews();
+    } else {
+      setLoading(false);
+    }
+  }, [id, user, businesses]);
+
+  // The JSX below uses this `reviews` array.
+  const reviews = backendReviews;
 
   if (!user)
     return (
@@ -66,7 +116,7 @@ export default function UserReviews() {
         >
           {reviews.map((r, i) => (
             <motion.div
-              key={r.id}
+              key={r._id || r.id}
               initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -103,7 +153,7 @@ export default function UserReviews() {
                 </p>
 
                 <div className="text-sm text-gray-500 dark:text-gray-400 italic text-right">
-                  {new Date().toLocaleDateString()}
+                  {new Date(r.createdAt || Date.now()).toLocaleDateString()}
                 </div>
               </div>
             </motion.div>

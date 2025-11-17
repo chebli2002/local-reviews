@@ -1,8 +1,12 @@
-import { createContext, useContext, useMemo, useState } from "react";
+// src/data/DataContext.jsx
+import { createContext, useContext, useMemo, useState, useEffect } from "react";
 import { nanoid } from "nanoid";
 
 const DataContext = createContext(null);
 export const useData = () => useContext(DataContext);
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 const categoriesSeed = [
   { id: "cat-food", name: "Food & Drink" },
@@ -92,55 +96,96 @@ const usersSeed = [
   { id: "u2", username: "bob", email: "bob@example.com", password: "bob123" },
 ];
 
-const reviewsSeed = [
-  {
-    id: "r1",
-    user_id: "u1",
-    business_id: "b1",
-    rating: 5,
-    comment: "Amazing coffee and friendly staff!",
-  },
-  {
-    id: "r2",
-    user_id: "u2",
-    business_id: "b1",
-    rating: 4,
-    comment: "Nice croissants and chill vibe.",
-  },
-  {
-    id: "r3",
-    user_id: "u2",
-    business_id: "b2",
-    rating: 3,
-    comment: "Good gym but too crowded.",
-  },
-];
+// normalize helpers
+function normalizeUser(user) {
+  if (!user) return null;
+  const id = user.id || user._id;
+  return {
+    ...user,
+    id,
+    _id: user._id || id,
+  };
+}
 
-function averageRating(businessId, reviews) {
-  const r = reviews.filter((rev) => rev.business_id === businessId);
-  if (!r.length) return 0;
-  return (
-    Math.round((r.reduce((sum, rev) => sum + rev.rating, 0) / r.length) * 10) /
-    10
-  );
+function normalizeBusiness(b) {
+  if (!b) return b;
+  const id = b.id || b._id;
+  let owner_id = b.owner_id ?? b.owner;
+  if (owner_id && typeof owner_id === "object") {
+    owner_id = owner_id._id || owner_id.id;
+  }
+
+  return {
+    ...b,
+    id,
+    _id: b._id || id,
+    owner_id,
+  };
 }
 
 export function DataProvider({ children }) {
   const [categories] = useState(categoriesSeed);
-  const [businesses, setBusinesses] = useState(businessesSeed);
+  const [businesses, setBusinesses] = useState([]);
   const [users, setUsers] = useState(usersSeed);
-  const [reviews, setReviews] = useState(reviewsSeed);
+  const [reviews, setReviews] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
 
-  const businessesWithRatings = useMemo(() => {
-    return businesses.map((b) => ({
-      ...b,
-      average_rating: averageRating(b.id, reviews),
-      review_count: reviews.filter((r) => r.business_id === b.id).length,
-    }));
-  }, [businesses, reviews]);
+  // 🔐 Load user from localStorage on mount, AND make sure users[] contains them
+  useEffect(() => {
+    const storedUser = localStorage.getItem("currentUser");
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        const normalized = normalizeUser(parsed);
+        setCurrentUser(normalized);
 
-  // ✅ Add business (assign owner)
+        // 🔑 make sure My Reviews can find this user by id
+        setUsers((prev) => {
+          const exists = prev.some((u) => u.id === normalized.id);
+          if (exists) return prev;
+          return [...prev, normalized];
+        });
+      } catch {
+        // ignore corrupted storage
+      }
+    }
+  }, []);
+
+  // 🔄 Load businesses from backend
+  const refreshBusinesses = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/businesses`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to load businesses");
+      }
+
+      const normalized = data.map((b) => normalizeBusiness(b));
+      setBusinesses(normalized);
+    } catch (err) {
+      console.error("Failed to load businesses:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    refreshBusinesses();
+  }, []);
+
+  const businessesWithRatings = useMemo(
+    () =>
+      businesses.map((b) => ({
+        ...b,
+        average_rating:
+          typeof b.average_rating === "number"
+            ? Math.round(b.average_rating * 10) / 10
+            : 0,
+        review_count: typeof b.review_count === "number" ? b.review_count : 0,
+      })),
+    [businesses]
+  );
+
+  // local-only helpers kept to avoid breaking components
   const addBusiness = (payload) => {
     if (!currentUser) throw new Error("You must log in first.");
     const id = nanoid(6);
@@ -162,8 +207,7 @@ export function DataProvider({ children }) {
     return id;
   };
 
-  // ✅ Update business (only owner can edit)
-  const updateBusiness = (id, payload) => {
+  const updateBusinessLocal = (id, payload) => {
     setBusinesses((prev) =>
       prev.map((b) =>
         b.id === id && b.owner_id === currentUser?.id ? { ...b, ...payload } : b
@@ -171,37 +215,125 @@ export function DataProvider({ children }) {
     );
   };
 
-  const addReview = ({ business_id, rating, comment }) => {
+  // backend review creation + local mirror
+  const addReview = async ({ business_id, rating, comment }) => {
     if (!currentUser) throw new Error("You must log in first.");
-    const review = {
-      id: nanoid(8),
-      user_id: currentUser.id,
-      business_id,
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("You are not authenticated.");
+    }
+
+    const body = {
+      businessId: business_id,
       rating: Number(rating),
       comment,
     };
-    setReviews((prev) => [review, ...prev]);
+
+    const res = await fetch(`${API_BASE_URL}/api/reviews`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      // ignore
+    }
+
+    if (!res.ok) {
+      throw new Error(data?.message || "Failed to submit review");
+    }
+
+    const normalizedReview = {
+      id: data._id || data.id || nanoid(8),
+      user_id: currentUser.id,
+      business_id,
+      rating: data.rating ?? Number(rating),
+      comment: data.comment ?? comment,
+    };
+
+    setReviews((prev) => [normalizedReview, ...prev]);
+
+    return normalizedReview;
   };
 
-  const login = ({ email, password }) => {
-    const user = users.find(
-      (u) =>
-        (u.email === email || u.username === email) && u.password === password
-    );
-    if (!user) throw new Error("Invalid credentials");
-    setCurrentUser(user);
-    return user;
+  // auth
+  const login = async ({ email, password }) => {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {}
+
+    if (!res.ok) {
+      const message = data?.message || "Login failed";
+      throw new Error(message);
+    }
+
+    const { token, user } = data;
+    const normalizedUser = normalizeUser(user);
+
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("currentUser", JSON.stringify(normalizedUser));
+    setCurrentUser(normalizedUser);
+
+    setUsers((prev) => {
+      const exists = prev.some((u) => u.id === normalizedUser.id);
+      if (exists) return prev;
+      return [...prev, normalizedUser];
+    });
+
+    return normalizedUser;
   };
 
-  const logout = () => setCurrentUser(null);
+  const register = async ({ username, email, password }) => {
+    const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, email, password }),
+    });
 
-  const register = ({ username, email, password }) => {
-    if (users.some((u) => u.email === email))
-      throw new Error("Email already in use");
-    const newUser = { id: nanoid(6), username, email, password };
-    setUsers((prev) => [...prev, newUser]);
-    setCurrentUser(newUser);
-    return newUser;
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {}
+
+    if (!res.ok) {
+      const message = data?.message || "Registration failed";
+      throw new Error(message);
+    }
+
+    const { token, user } = data;
+    const normalizedUser = normalizeUser(user);
+
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("currentUser", JSON.stringify(normalizedUser));
+    setCurrentUser(normalizedUser);
+
+    setUsers((prev) => [...prev, normalizedUser]);
+
+    return normalizedUser;
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("currentUser");
   };
 
   const getUserReviews = (userId) =>
@@ -215,12 +347,13 @@ export function DataProvider({ children }) {
     reviews,
     currentUser,
     addBusiness,
-    updateBusiness,
+    updateBusiness: updateBusinessLocal,
     addReview,
     login,
     logout,
     register,
     getUserReviews,
+    refreshBusinesses,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

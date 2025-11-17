@@ -10,7 +10,6 @@ export async function getAllBusinesses(req, res) {
   try {
     const businesses = await Business.find().lean();
 
-    // For each business calculate review_count and average_rating
     const businessesWithStats = await Promise.all(
       businesses.map(async (b) => {
         const reviews = await Review.find({ business: b._id });
@@ -75,8 +74,16 @@ export async function getBusinessById(req, res) {
  */
 export async function createBusiness(req, res) {
   try {
-    const { name, description, address, phone, website, category_id } =
-      req.body;
+    const {
+      name,
+      description,
+      address,
+      phone,
+      website,
+      category_id,
+      google_map_url,
+      photos,
+    } = req.body;
 
     if (!name || !address || !category_id) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -89,7 +96,9 @@ export async function createBusiness(req, res) {
       phone,
       website,
       category_id,
-      owner: req.user._id, // from auth middleware
+      owner_id: req.user._id, // from auth middleware
+      google_map_url,
+      photos,
     });
 
     res.status(201).json(business);
@@ -111,7 +120,17 @@ export async function updateBusiness(req, res) {
       return res.status(404).json({ message: "Business not found" });
     }
 
-    if (business.owner.toString() !== req.user._id.toString()) {
+    // Support both new owner_id and legacy owner field.
+    // If no owner is set at all, first editor becomes the owner.
+    let ownerId = business.owner_id || business.owner;
+
+    if (!ownerId) {
+      // claim ownership if business has no owner
+      business.owner_id = req.user._id;
+      ownerId = req.user._id;
+    }
+
+    if (ownerId.toString() !== req.user._id.toString()) {
       return res
         .status(403)
         .json({ message: "Not allowed to edit this business" });
@@ -124,6 +143,8 @@ export async function updateBusiness(req, res) {
       "phone",
       "website",
       "category_id",
+      "google_map_url",
+      "photos",
     ];
 
     updateFields.forEach((field) => {
@@ -132,9 +153,9 @@ export async function updateBusiness(req, res) {
       }
     });
 
-    await business.save();
+    const updated = await business.save();
 
-    res.json(business);
+    res.json(updated);
   } catch (err) {
     console.error("updateBusiness error:", err);
     res.status(500).json({ message: "Server error" });
@@ -154,7 +175,15 @@ export async function deleteBusiness(req, res) {
       return res.status(404).json({ message: "Business not found" });
     }
 
-    if (business.owner.toString() !== req.user._id.toString()) {
+    let ownerId = business.owner_id || business.owner;
+
+    if (!ownerId) {
+      // no owner recorded: only current user can "claim & delete"
+      business.owner_id = req.user._id;
+      ownerId = req.user._id;
+    }
+
+    if (ownerId.toString() !== req.user._id.toString()) {
       return res
         .status(403)
         .json({ message: "Not allowed to delete this business" });

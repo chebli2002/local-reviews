@@ -32,7 +32,7 @@ export default function RegisterForm() {
   const handleChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!form.username || !form.email || !form.password)
@@ -42,7 +42,7 @@ export default function RegisterForm() {
     if (form.password !== form.confirm)
       return setError("Passwords do not match.");
     try {
-      const user = register({
+      const user = await register({
         username: form.username,
         email: form.email,
         password: form.password,
