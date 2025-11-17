@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useData } from "../../data/DataContext.jsx";
@@ -27,6 +27,37 @@ export default function BusinessForm({ isEdit = false }) {
     photos: [],
   });
 
+  const {
+    categories,
+    rawBusinesses,
+    addBusiness,
+    updateBusiness,
+    currentUser,
+  } = useData();
+
+  const existing = rawBusinesses.find((b) => b.id === id);
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+  const formTemplate = useMemo(
+    () => ({
+      name: "",
+      description: "",
+      address: "",
+      phone: "",
+      website: "",
+      category_id: categories[0]?.id || "",
+      heroImage: "",
+      galleryInput: "",
+      highlightsInput: "",
+      mapEmbed: "",
+      hoursWeekdays: "",
+      hoursWeekend: "",
+    }),
+    [categories]
+  );
+
+  const [form, setForm] = useState(formTemplate);
   const [error, setError] = useState("");
 
   // fill form when editing
@@ -44,6 +75,32 @@ export default function BusinessForm({ isEdit = false }) {
       });
     }
   }, [isEdit, existing, categories]);
+        ...formTemplate,
+        ...existing,
+        heroImage: existing.heroImage || "",
+        mapEmbed: existing.mapEmbed || "",
+        galleryInput: existing.gallery?.join(", ") || "",
+        highlightsInput: existing.highlights?.join(", ") || "",
+        hoursWeekdays: existing.hours?.weekdays || "",
+        hoursWeekend: existing.hours?.weekend || "",
+      });
+    } else {
+      setForm(formTemplate);
+    }
+  }, [isEdit, existing, formTemplate]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setIsDark(root.classList.contains("dark"));
+    });
+    observer.observe(root, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -156,6 +213,43 @@ export default function BusinessForm({ isEdit = false }) {
       }
     } catch (err) {
       setError(err.message || "Server error");
+    // ✅ Ownership check
+    const payload = {
+      name: form.name.trim(),
+      description: form.description.trim(),
+      address: form.address.trim(),
+      phone: form.phone.trim(),
+      website: form.website.trim(),
+      category_id: form.category_id,
+      heroImage: form.heroImage.trim(),
+      mapEmbed: form.mapEmbed.trim(),
+      gallery: form.galleryInput
+        .split(",")
+        .map((url) => url.trim())
+        .filter(Boolean),
+      highlights: form.highlightsInput
+        .split(",")
+        .map((text) => text.trim())
+        .filter(Boolean),
+      hours:
+        form.hoursWeekdays || form.hoursWeekend
+          ? {
+              ...(form.hoursWeekdays && { weekdays: form.hoursWeekdays.trim() }),
+              ...(form.hoursWeekend && { weekend: form.hoursWeekend.trim() }),
+            }
+          : {},
+    };
+
+    if (isEdit && existing) {
+      if (existing.owner_id !== currentUser.id) {
+        setError("You are not authorized to edit this business.");
+        return;
+      }
+      updateBusiness(existing.id, payload);
+      navigate(`/businesses/${existing.id}`);
+    } else {
+      const newId = addBusiness(payload);
+      navigate(`/businesses/${newId}`);
     }
   };
 
@@ -343,6 +437,94 @@ export default function BusinessForm({ isEdit = false }) {
                   ))}
                 </div>
               )}
+            {/* Hero Image */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Hero image URL
+              </label>
+              <input
+                name="heroImage"
+                value={form.heroImage}
+                onChange={handleChange}
+                className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                placeholder="https://images.unsplash.com/your-photo"
+              />
+            </div>
+
+            {/* Gallery + Highlights */}
+            <div className="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Gallery image URLs
+                </label>
+                <textarea
+                  name="galleryInput"
+                  value={form.galleryInput}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                  placeholder="Separate image URLs with commas"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Example: url-one.com, url-two.com
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Highlights
+                </label>
+                <input
+                  name="highlightsInput"
+                  value={form.highlightsInput}
+                  onChange={handleChange}
+                  className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                  placeholder="Comma separated features (e.g. Outdoor seating, Vegan menu)"
+                />
+              </div>
+            </div>
+
+            {/* Map + Hours */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Map embed URL
+              </label>
+              <input
+                name="mapEmbed"
+                value={form.mapEmbed}
+                onChange={handleChange}
+                className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                placeholder="https://maps.google.com/maps?..."
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Use the embed URL from Google Maps (output=embed).
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Weekday hours
+                </label>
+                <input
+                  name="hoursWeekdays"
+                  value={form.hoursWeekdays}
+                  onChange={handleChange}
+                  className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                  placeholder="e.g. 9:00 AM – 6:00 PM"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Weekend hours
+                </label>
+                <input
+                  name="hoursWeekend"
+                  value={form.hoursWeekend}
+                  onChange={handleChange}
+                  className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                  placeholder="e.g. 10:00 AM – 4:00 PM"
+                />
+              </div>
             </div>
 
             <motion.button

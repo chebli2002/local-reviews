@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
 import { useData } from "../data/DataContext.jsx";
+import RatingStars from "./business/RatingStars.jsx";
 
 export default function Home() {
-  const { businesses, categories } = useData();
+  const { businesses, categories, currentUser } = useData();
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
@@ -44,8 +44,6 @@ export default function Home() {
     show: { opacity: 1, y: 0, transition: { duration: 1.2, ease: "easeOut" } },
   };
 
-  const title = "Discover the Best Local Businesses";
-
   const categoryImages = {
     "Food & Drink":
       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
@@ -61,65 +59,59 @@ export default function Home() {
 
       <div className="relative z-10 px-6 py-20 space-y-28">
         {/* HERO */}
-        <section className="min-h-[80vh] flex flex-col items-center justify-center text-center">
+        <section className="min-h-[80vh] flex flex-col items-center justify-center text-center gap-8">
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-xs sm:text-sm uppercase tracking-[0.6em] text-indigo-500 dark:text-indigo-300"
+          >
+            Local Reviews
+          </motion.p>
+
           <motion.h1
-            variants={{
-              hidden: { opacity: 0, y: 40 },
-              show: {
-                opacity: 1,
-                y: 0,
-                transition: {
-                  duration: 1.2,
-                  ease: "easeOut",
-                  staggerChildren: 0.04,
-                },
-              },
-            }}
-            initial="hidden"
-            animate="show"
-            className="leading-tight font-extrabold drop-shadow-xl text-[10vw] sm:text-[8rem] transition-colors duration-500"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight transition-colors duration-500"
             style={{
-              whiteSpace: "pre-line",
-              color: isDark ? "white" : "#111827",
+              color: isDark ? "white" : "#0f172a",
             }}
           >
-            {title.split("").map((char, i) => (
-              <motion.span
-                key={i}
-                variants={{
-                  hidden: { opacity: 0, y: 40 },
-                  show: { opacity: 1, y: 0 },
-                }}
-                className="inline-block"
-              >
-                {char === " " ? "\u00A0" : char}
-              </motion.span>
-            ))}
+            Discover standout local{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+              businesses
+            </span>{" "}
+            and share your story.
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 1.2 }}
-            className="text-xl sm:text-2xl mt-6 mb-12 max-w-3xl transition-colors duration-500"
-            style={{
-              color: isDark ? "white" : "#1F2937",
-            }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.9 }}
+            className="text-base sm:text-xl max-w-3xl text-gray-700 dark:text-gray-200"
           >
-            Read trusted reviews, share your experience, and explore top-rated
-            spots near you.
+            Read trusted reviews from neighbors, support independent shops, and
+            help others discover their next favorite spot.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.8, duration: 0.9, ease: "easeOut" }}
+            transition={{ delay: 0.35, duration: 0.8 }}
+            className="flex flex-wrap items-center justify-center gap-4"
           >
             <Link
               to="/businesses"
-              className="px-8 sm:px-10 py-4 sm:py-5 text-lg sm:text-2xl rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl hover:shadow-2xl hover:scale-[1.03] transition-all duration-500"
+              className="px-8 py-4 text-lg rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
             >
-              Explore Businesses
+              Browse businesses
+            </Link>
+            <Link
+              to={currentUser ? "/businesses/new" : "/login"}
+              className="px-8 py-4 text-lg rounded-full border border-white/60 dark:border-gray-700/60 text-gray-900 dark:text-white hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all duration-300"
+            >
+              List your business
             </Link>
           </motion.div>
         </section>
@@ -221,14 +213,11 @@ export default function Home() {
                     </p>
 
                     <div className="mt-3 flex items-center gap-2">
-                      <div className="flex items-center text-gray-900 dark:text-white text-base">
-                        <Star
-                          className={`w-4 h-4 fill-current ${
-                            isDark ? "text-white" : "text-gray-900"
-                          }`}
-                        />
-                        <span className="ml-1">{b.average_rating}</span>
-                      </div>
+                      <RatingStars
+                        rating={b.average_rating}
+                        size={16}
+                        className="text-gray-900 dark:text-white"
+                      />
                       <span className="text-gray-600 dark:text-gray-300 text-sm">
                         • {b.review_count} reviews
                       </span>
