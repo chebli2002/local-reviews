@@ -32,7 +32,7 @@ export default function Navbar() {
 
   const alwaysVisibleLinks = [
     { to: "/businesses", label: "All Businesses" },
-    { to: "/businesses/new", label: "List your business" },
+    { to: "/my-businesses", label: "List your business" },
     { to: "/about", label: "About us" },
   ];
 
