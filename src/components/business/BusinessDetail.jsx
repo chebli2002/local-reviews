@@ -4,14 +4,19 @@ import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { useData } from "../../data/DataContext.jsx";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 export default function BusinessDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { businesses, reviews, users, currentUser } = useData();
+  const { businesses, currentUser } = useData();
+
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
 
+  // Watch dark mode changes (your original logic)
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -23,14 +28,41 @@ export default function BusinessDetail() {
     return () => observer.disconnect();
   }, []);
 
+  // 🔥 Reviews loaded from backend
+  const [bizReviews, setBizReviews] = useState([]);
+
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/reviews/business/${id}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || "Failed to load reviews");
+        }
+
+        setBizReviews(data);
+      } catch (err) {
+        console.error("Failed to load reviews:", err.message);
+        setBizReviews([]);
+      }
+    }
+
+    fetchReviews();
+  }, [id]);
+
+  // Find this business from context (which comes from backend)
   const business = businesses.find((b) => b.id === id);
-  const bizReviews = reviews
-    .filter((r) => r.business_id === id)
-    .map((r) => ({
-      ...r,
-      user: users.find((u) => u.id === r.user_id),
-    }))
-    .sort((a, b) => b.id.localeCompare(a.id));
+
+  // Safely compute average rating
+  const avgRating =
+    bizReviews.length > 0
+      ? Math.round(
+          (bizReviews.reduce((sum, r) => sum + r.rating, 0) /
+            bizReviews.length) *
+            10
+        ) / 10
+      : business?.average_rating ?? 0;
 
   if (!business)
     return (
@@ -39,8 +71,12 @@ export default function BusinessDetail() {
       </div>
     );
 
+  const hasMap = !!business.google_map_url;
+  const photos = business.photos || [];
+
   return (
     <section className="max-w-4xl mx-auto px-6 py-14 space-y-10">
+      {/* Top card with name / rating / buttons */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -88,7 +124,7 @@ export default function BusinessDetail() {
                   isDark ? "text-white" : "text-gray-900"
                 }`}
               />
-              {business.average_rating}
+              {avgRating}
               <span className="text-gray-600 dark:text-gray-300 font-normal">
                 • {bizReviews.length} reviews
               </span>
@@ -116,6 +152,7 @@ export default function BusinessDetail() {
         </div>
       </motion.div>
 
+      {/* About */}
       {business.description && (
         <motion.div
           initial={{ opacity: 0, y: 25 }}
@@ -135,11 +172,78 @@ export default function BusinessDetail() {
         </motion.div>
       )}
 
-      {/* ✅ Reviews Section - Visible to everyone */}
+      {/* Location / Google Maps */}
+      {hasMap && (
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.15 }}
+          className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-8 border border-white/50 dark:border-gray-700/50 shadow-md hover:shadow-xl transition-all duration-500"
+        >
+          <h2
+            className="text-2xl font-bold mb-3 transition-colors duration-300"
+            style={{ color: isDark ? "white" : "#111827" }}
+          >
+            Location
+          </h2>
+          <div className="space-y-3">
+            <div className="w-full h-64 rounded-2xl overflow-hidden border border-white/60 dark:border-gray-700/60 bg-gray-100 dark:bg-gray-900">
+              <iframe
+                title="Google Maps"
+                src={business.google_map_url}
+                className="w-full h-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+            <a
+              href={business.google_map_url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+            >
+              Open in Google Maps
+            </a>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Photos */}
+      {photos.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-8 border border-white/50 dark:border-gray-700/50 shadow-md hover:shadow-xl transition-all duration-500"
+        >
+          <h2
+            className="text-2xl font-bold mb-3 transition-colors duration-300"
+            style={{ color: isDark ? "white" : "#111827" }}
+          >
+            Photos
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {photos.map((src, index) => (
+              <div
+                key={index}
+                className="relative rounded-2xl overflow-hidden border border-white/60 dark:border-gray-700/60 bg-gray-100 dark:bg-gray-900"
+              >
+                <img
+                  src={src}
+                  alt={`Photo ${index + 1}`}
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Customer Reviews */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
+        transition={{ duration: 0.8, delay: 0.25 }}
         className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-8 border border-white/50 dark:border-gray-700/50 shadow-md hover:shadow-xl transition-all duration-500"
       >
         <h2
@@ -155,7 +259,7 @@ export default function BusinessDetail() {
           <ul className="space-y-4">
             {bizReviews.map((r) => (
               <li
-                key={r.id}
+                key={r._id || r.id}
                 className="p-4 rounded-xl bg-white/60 dark:bg-gray-900/50 border border-white/30 dark:border-gray-700/40 backdrop-blur-md transition-all duration-300 hover:shadow-md"
               >
                 <p className="text-gray-900 dark:text-gray-100 text-base mb-2">

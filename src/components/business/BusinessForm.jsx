@@ -3,18 +3,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useData } from "../../data/DataContext.jsx";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 export default function BusinessForm({ isEdit = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const {
-    categories,
-    rawBusinesses,
-    addBusiness,
-    updateBusiness,
-    currentUser,
-  } = useData();
+  const { categories, rawBusinesses, currentUser, refreshBusinesses } =
+    useData();
 
-  const existing = rawBusinesses.find((b) => b.id === id);
+  // try both id and _id just in case
+  const existing =
+    rawBusinesses?.find((b) => b.id === id || b._id === id) || null;
+
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -22,17 +23,73 @@ export default function BusinessForm({ isEdit = false }) {
     phone: "",
     website: "",
     category_id: categories[0]?.id || "",
+    google_map_url: "",
+    photos: [],
   });
+
   const [error, setError] = useState("");
 
+  // fill form when editing
   useEffect(() => {
-    if (isEdit && existing) setForm(existing);
-  }, [isEdit, existing]);
+    if (isEdit && existing) {
+      setForm({
+        name: existing.name || "",
+        description: existing.description || "",
+        address: existing.address || "",
+        phone: existing.phone || "",
+        website: existing.website || "",
+        category_id: existing.category_id || categories[0]?.id || "",
+        google_map_url: existing.google_map_url || "",
+        photos: existing.photos || [],
+      });
+    }
+  }, [isEdit, existing, categories]);
 
   const handleChange = (e) =>
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  // ---------- photos (drag & drop / file input) ----------
+  const handleFiles = (files) => {
+    const list = Array.from(files);
+    list.forEach((file) => {
+      if (!file.type.startsWith("image/")) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const url = ev.target?.result;
+        if (!url) return;
+        setForm((prev) => ({
+          ...prev,
+          photos: [...(prev.photos || []), url],
+        }));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+      e.dataTransfer.clearData();
+    }
+  };
+
+  const handleFileInput = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFiles(e.target.files);
+    }
+  };
+
+  const removePhoto = (index) => {
+    setForm((prev) => ({
+      ...prev,
+      photos: prev.photos.filter((_, i) => i !== index),
+    }));
+  };
+
+  // ---------- submit ----------
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -46,19 +103,65 @@ export default function BusinessForm({ isEdit = false }) {
       return;
     }
 
-    // ✅ Ownership check
-    if (isEdit && existing) {
-      if (existing.owner_id !== currentUser.id) {
-        setError("You are not authorized to edit this business.");
-        return;
+    const token = localStorage.getItem("authToken");
+
+    try {
+      if (isEdit && existing) {
+        // EDIT (PUT)
+        const businessId = existing.id || existing._id || id;
+
+        const res = await fetch(
+          `${API_BASE_URL}/api/businesses/${businessId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(form),
+          }
+        );
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || "Failed to update business");
+        }
+
+        // 🔄 reload businesses from backend so google_map_url + photos are up to date
+        await refreshBusinesses();
+
+        navigate(`/businesses/${businessId}`);
+      } else {
+        // CREATE (POST)
+        const res = await fetch(`${API_BASE_URL}/api/businesses`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(form),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || "Failed to create business");
+        }
+
+        const newId = data._id || data.id;
+
+        // 🔄 reload businesses from backend so new business has google_map_url + photos
+        await refreshBusinesses();
+
+        navigate(`/businesses/${newId}`);
       }
-      updateBusiness(existing.id, form);
-      navigate(`/businesses/${existing.id}`);
-    } else {
-      const newId = addBusiness(form);
-      navigate(`/businesses/${newId}`);
+    } catch (err) {
+      setError(err.message || "Server error");
     }
   };
+
+  const [isDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
 
   return (
     <section className="min-h-[90vh] flex items-center justify-center px-6">
@@ -171,6 +274,75 @@ export default function BusinessForm({ isEdit = false }) {
                   ))}
                 </select>
               </div>
+            </div>
+
+            {/* Google Maps URL */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Google Maps URL
+              </label>
+              <input
+                name="google_map_url"
+                value={form.google_map_url}
+                onChange={handleChange}
+                className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
+                placeholder="Paste Google Maps share link"
+              />
+            </div>
+
+            {/* Photos drag & drop */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Photos (drag & drop or click to upload)
+              </label>
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onDrop={handleDrop}
+                className="w-full rounded-xl border-2 border-dashed border-indigo-300 dark:border-indigo-500 bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm px-4 py-6 text-center text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-400 transition-colors"
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileInput}
+                  className="hidden"
+                  id="photo-upload-input"
+                />
+                <label htmlFor="photo-upload-input" className="cursor-pointer">
+                  Drop images here or{" "}
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                    browse files
+                  </span>
+                  .
+                </label>
+              </div>
+
+              {form.photos && form.photos.length > 0 && (
+                <div className="mt-3 grid grid-cols-3 gap-3">
+                  {form.photos.map((src, index) => (
+                    <div
+                      key={index}
+                      className="relative rounded-xl overflow-hidden border border-white/60 dark:border-gray-700/60 bg-gray-100 dark:bg-gray-900"
+                    >
+                      <img
+                        src={src}
+                        alt={`Photo ${index + 1}`}
+                        className="w-full h-24 object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(index)}
+                        className="absolute top-1 right-1 text-xs px-2 py-1 rounded-full bg-black/60 text-white"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <motion.button

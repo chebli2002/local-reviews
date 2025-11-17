@@ -24,13 +24,13 @@ export default function LoginForm() {
     return () => observer.disconnect();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!email || !password)
       return setError("Email/Username and password are required.");
     try {
-      const user = login({ email, password });
+      const user = await login({ email, password });
       navigate(`/users/${user.id}/reviews`);
     } catch (err) {
       setError(err.message || "Login failed");

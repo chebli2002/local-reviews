@@ -34,7 +34,7 @@ export default function WriteReviewForm() {
       </div>
     );
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -44,7 +44,25 @@ export default function WriteReviewForm() {
       return setError("Please enter at least 5 characters.");
 
     try {
-      addReview({ business_id: id, rating, comment });
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("You must be logged in.");
+
+      const res = await fetch("http://localhost:5000/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          business_id: id,
+          rating,
+          comment,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to submit review.");
+
       navigate(`/businesses/${id}`);
     } catch (err) {
       setError(err.message || "Failed to submit review.");
