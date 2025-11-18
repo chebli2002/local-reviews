@@ -76,7 +76,11 @@ const businessesSeed = [
       "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=900&q=80",
       "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80",
     ],
-    highlights: ["Same-day turnaround", "Certified technicians", "1-year warranty"],
+    highlights: [
+      "Same-day turnaround",
+      "Certified technicians",
+      "1-year warranty",
+    ],
     hours: {
       weekdays: "9:00 AM – 7:00 PM",
       weekend: "10:00 AM – 4:00 PM",
@@ -215,6 +219,41 @@ export function DataProvider({ children }) {
     );
   };
 
+  const deleteBusiness = async (businessId) => {
+    if (!currentUser) {
+      throw new Error("You must log in first.");
+    }
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("You are not authenticated.");
+    }
+
+    const res = await fetch(`${API_BASE_URL}/api/businesses/${businessId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      // ignore
+    }
+
+    if (!res.ok) {
+      throw new Error(data?.message || "Failed to delete business");
+    }
+
+    setBusinesses((prev) =>
+      prev.filter((b) => b.id !== businessId && b._id !== businessId)
+    );
+
+    return true;
+  };
+
   // backend review creation + local mirror
   const addReview = async ({ business_id, rating, comment }) => {
     if (!currentUser) throw new Error("You must log in first.");
@@ -348,6 +387,7 @@ export function DataProvider({ children }) {
     currentUser,
     addBusiness,
     updateBusiness: updateBusinessLocal,
+    deleteBusiness,
     addReview,
     login,
     logout,

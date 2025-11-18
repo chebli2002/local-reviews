@@ -11,7 +11,7 @@ function useQuery() {
 }
 
 export default function BusinessesList() {
-  const { businesses, categories } = useData();
+  const { businesses, categories, currentUser, deleteBusiness } = useData();
   const qs = useQuery();
 
   const [term, setTerm] = useState(qs.get("q") || "");
@@ -20,6 +20,9 @@ export default function BusinessesList() {
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
+
+  // store the FULL business object for the confirmation modal
+  const [confirmBusiness, setConfirmBusiness] = useState(null);
 
   // 🌓 Watch for dark mode toggle dynamically
   useEffect(() => {
@@ -48,6 +51,19 @@ export default function BusinessesList() {
       if (sort === "reviews") return b.review_count - a.review_count;
       return a.name.localeCompare(b.name);
     });
+
+  const handleConfirmDelete = async () => {
+    if (!confirmBusiness) return;
+    try {
+      await deleteBusiness(confirmBusiness.id);
+      setConfirmBusiness(null);
+      // 🔁 hard reload so the list is rebuilt from fresh state
+      window.location.reload();
+    } catch (err) {
+      console.error("Failed to delete business:", err.message);
+      alert(err.message || "Failed to delete business");
+    }
+  };
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-14 space-y-12 text-gray-900 dark:text-white">
@@ -233,6 +249,16 @@ export default function BusinessesList() {
                       Review
                     </Link>
                   </motion.div>
+                  {currentUser && currentUser.id === b.owner_id && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setConfirmBusiness(b)}
+                      className="btn-outline px-4 py-2"
+                    >
+                      Delete
+                    </motion.button>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -279,6 +305,35 @@ export default function BusinessesList() {
           </motion.div>
         )}
       </div>
+
+      {/* Delete confirmation modal */}
+      {confirmBusiness && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="max-w-sm w-full mx-4 rounded-2xl bg-white dark:bg-gray-800 shadow-xl p-6 border border-white/60 dark:border-gray-700/60">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Delete this business?
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              This action cannot be undone. Are you sure you want to permanently
+              delete "{confirmBusiness.name}" and all of its reviews?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmBusiness(null)}
+                className="btn-outline text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="btn-primary text-sm"
+              >
+                Yes, delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

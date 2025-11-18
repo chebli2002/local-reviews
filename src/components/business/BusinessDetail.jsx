@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { useData } from "../../data/DataContext.jsx";
@@ -9,8 +9,7 @@ const API_BASE_URL =
 
 export default function BusinessDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { businesses, currentUser } = useData();
+  const { businesses, currentUser, deleteBusiness } = useData();
 
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
@@ -73,6 +72,20 @@ export default function BusinessDetail() {
 
   const hasMap = !!business.google_map_url;
   const photos = business.photos || [];
+
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleDeleteConfirmed = async () => {
+    try {
+      await deleteBusiness(business.id);
+      setShowConfirm(false);
+      // 🔁 force a clean reload on the list page to avoid any SPA glitch
+      window.location.href = "/businesses";
+    } catch (err) {
+      console.error("Failed to delete business:", err.message);
+      alert(err.message || "Failed to delete business");
+    }
+  };
 
   return (
     <section className="max-w-4xl mx-auto px-6 py-14 space-y-10">
@@ -139,12 +152,22 @@ export default function BusinessDetail() {
               Write a Review
             </Link>
             {currentUser && currentUser.id === business.owner_id && (
-              <button
-                onClick={() => navigate(`/businesses/${business.id}/edit`)}
-                className="btn-outline text-base"
-              >
-                Edit Business
-              </button>
+              <>
+                <button
+                  onClick={() =>
+                    window.location.assign(`/businesses/${business.id}/edit`)
+                  }
+                  className="btn-outline text-base"
+                >
+                  Edit Business
+                </button>
+                <button
+                  onClick={() => setShowConfirm(true)}
+                  className="btn-outline text-base"
+                >
+                  Delete Business
+                </button>
+              </>
             )}
           </div>
 
@@ -273,6 +296,35 @@ export default function BusinessDetail() {
           </ul>
         )}
       </motion.div>
+
+      {/* Delete confirmation modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="max-w-sm w-full mx-4 rounded-2xl bg-white dark:bg-gray-800 shadow-xl p-6 border border-white/60 dark:border-gray-700/60">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Delete this business?
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              This action cannot be undone. Are you sure you want to permanently
+              delete "{business.name}" and all of its reviews?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="btn-outline text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirmed}
+                className="btn-primary text-sm"
+              >
+                Yes, delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
