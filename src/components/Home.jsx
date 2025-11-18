@@ -60,14 +60,18 @@ export default function Home() {
       <div className="relative z-10 px-6 py-20 space-y-28">
         {/* HERO */}
         <section className="min-h-[80vh] flex flex-col items-center justify-center text-center gap-8">
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-xs sm:text-sm uppercase tracking-[0.6em] text-indigo-500 dark:text-indigo-300"
-          >
-            Local Reviews
-          </motion.p>
+         <motion.p
+  initial={{ opacity: 0, y: 16 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8 }}
+  className="text-xs sm:text-sm uppercase tracking-[0.6em] dark:text-indigo-300"
+  style={{
+    color: isDark ? "#93c5fd" : "#000000", // black in light mode, indigo-300 in dark mode
+  }}
+>
+  Local Reviews
+</motion.p>
+
 
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
