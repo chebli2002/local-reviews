@@ -85,11 +85,15 @@ export default function Home() {
             and share your story.
           </motion.h1>
 
+          {/* ⭐ SUBTITLE WE'RE FIXING */}
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.9 }}
-            className="text-base sm:text-xl max-w-3xl text-gray-800 dark:text-gray-200"
+            className="text-base sm:text-xl max-w-3xl mx-auto transition-colors duration-500"
+            style={{
+              color: isDark ? "#ffffff" : "#111827", // dark: white, light: almost black
+            }}
           >
             Read trusted reviews from neighbors, support independent shops, and
             help others discover their next favorite spot.
@@ -170,7 +174,7 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* 🌟 TOP RATED — MATCHED EXACTLY WITH BUSINESSLIST */}
+        {/* TOP RATED */}
         <motion.section
           variants={fadeInUp}
           initial="hidden"
