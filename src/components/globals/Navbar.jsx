@@ -14,7 +14,7 @@ export default function Navbar() {
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // 🌓 Watch for dark mode toggle dynamically
+  // Watch for dark mode toggle dynamically
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -83,21 +83,28 @@ export default function Navbar() {
             aria-label="Primary navigation"
           >
             {navigationLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  twMerge(
-                    "transition-colors duration-300 font-medium text-base",
-                    isActive
-                      ? "text-indigo-600! dark:text-pink-300"
-                      : "text-slate-900! dark:text-gray-100 hover:text-indigo-500 dark:hover:text-pink-200"
-                  )
-                }
-              >
-                {link.label}
+              <NavLink key={link.to} to={link.to}>
+                {({ isActive }) => (
+                  <span
+                    className={twMerge(
+                      "transition-colors duration-300 font-medium text-base"
+                    )}
+                    style={{
+                      color: isDark
+                        ? isActive
+                          ? "#F9A8FF" // dark active: pink-ish
+                          : "#FFFFFF" // dark default: white
+                        : isActive
+                        ? "#4F46E5" // light active: indigo
+                        : "#111827", // light default: near-black
+                    }}
+                  >
+                    {link.label}
+                  </span>
+                )}
               </NavLink>
             ))}
+
             {currentUser && (
               <button
                 onClick={handleLogout}
@@ -149,21 +156,28 @@ export default function Navbar() {
       >
         <div className="px-6 py-4 flex flex-col gap-3">
           {navigationLinks.map((link) => (
-            <NavLink
-              key={`mobile-${link.to}`}
-              to={link.to}
-              className={({ isActive }) =>
-                twMerge(
-                  "transition-colors duration-300 font-medium text-lg",
-                  isActive
-                    ? "text-indigo-600 dark:text-pink-300"
-                    : "text-slate-900 dark:text-gray-100 hover:text-indigo-500 dark:hover:text-pink-200"
-                )
-              }
-            >
-              {link.label}
+            <NavLink key={`mobile-${link.to}`} to={link.to}>
+              {({ isActive }) => (
+                <span
+                  className={twMerge(
+                    "transition-colors duration-300 font-medium text-lg"
+                  )}
+                  style={{
+                    color: isDark
+                      ? isActive
+                        ? "#F9A8FF"
+                        : "#FFFFFF"
+                      : isActive
+                      ? "#4F46E5"
+                      : "#111827",
+                  }}
+                >
+                  {link.label}
+                </span>
+              )}
             </NavLink>
           ))}
+
           {currentUser && (
             <button
               onClick={handleLogout}
