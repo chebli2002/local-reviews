@@ -245,3 +245,10 @@ header.bg-gradient-aurora {
   background-attachment: fixed;
   background-size: 400% 400%;
 }
+/* Force Navbar links to respect Tailwind classes */
+header nav a {
+  color: inherit !important;
+}
+.dark header nav a {
+  color: inherit !important;
+}
