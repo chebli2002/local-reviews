@@ -9,7 +9,8 @@ const API_BASE_URL =
 export default function BusinessForm({ isEdit = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { categories, rawBusinesses, currentUser } = useData();
+  const { categories, rawBusinesses, currentUser, refreshBusinesses } =
+    useData();
 
   // try both id and _id just in case
   const existing =
@@ -125,6 +126,8 @@ export default function BusinessForm({ isEdit = false }) {
           throw new Error(data.message || "Failed to update business");
         }
 
+        // 🔄 make sure all lists/detail views see fresh data
+        await refreshBusinesses();
         navigate(`/businesses/${businessId}`);
       } else {
         const res = await fetch(`${API_BASE_URL}/api/businesses`, {
@@ -142,6 +145,9 @@ export default function BusinessForm({ isEdit = false }) {
         }
 
         const newId = data._id || data.id;
+
+        // 🔄 refresh global businesses so MyBusinesses / All Businesses / Detail are up-to-date
+        await refreshBusinesses();
         navigate(`/businesses/${newId}`);
       }
     } catch (err) {
