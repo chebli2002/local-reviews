@@ -116,20 +116,33 @@ export default function BusinessDetail() {
             </div>
 
             <div
-              className="mt-4 text-base font-semibold flex items-center gap-2 transition-colors duration-300"
-              style={{ color: isDark ? "white" : "#111827" }}
-            >
-              <Star
-                className={`w-5 h-5 fill-current ${
-                  isDark ? "text-white" : "text-gray-900"
-                }`}
-              />
-              {avgRating}
-              <span className="text-gray-600 dark:text-gray-300 font-normal">
-                • {bizReviews.length} reviews
-              </span>
-            </div>
-          </div>
+  className="mt-4 text-base font-semibold flex items-center gap-2 transition-colors duration-300"
+  style={{ color: isDark ? "white" : "#111827" }}
+>
+  {/* Star rating display */}
+  <div className="flex items-center gap-1">
+    {[1, 2, 3, 4, 5].map((star) => (
+      <Star
+        key={star}
+        className={`w-5 h-5 ${
+          star <= Math.round(avgRating)
+            ? "fill-yellow-400 text-yellow-400"
+            : "text-gray-300 dark:text-gray-600"
+        }`}
+      />
+    ))}
+  </div>
+  
+  <span className="ml-1">{avgRating}</span>
+  <span className="text-gray-600 dark:text-gray-300 font-normal">
+    • {bizReviews.length} reviews
+  </span>
+</div>
+  <span className="ml-1">{avgRating}</span>
+  <span className="text-gray-600 dark:text-gray-300 font-normal">
+    • {bizReviews.length} reviews
+  </span>
+</div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
