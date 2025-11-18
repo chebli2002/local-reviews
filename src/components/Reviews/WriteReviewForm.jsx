@@ -3,10 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useData } from "../../data/DataContext.jsx";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 export default function WriteReviewForm() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { businesses, addReview } = useData();
+  const { businesses } = useData();
   const business = businesses.find((b) => b.id === id);
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
@@ -47,7 +50,7 @@ export default function WriteReviewForm() {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("You must be logged in.");
 
-      const res = await fetch("http://localhost:5000/api/reviews", {
+      const res = await fetch(`${API_BASE_URL}/api/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
