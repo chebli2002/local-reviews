@@ -1,20 +1,30 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useData } from "../../data/DataContext.jsx";
+import { Link, NavLink } from "react-router-dom";
+import { useData } from "../data/DataContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 
 export default function Navbar() {
   const { currentUser, logout } = useData();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // 🌓 Watch for dark mode toggle dynamically
+  const navigationLinks = currentUser
+    ? [
+        { to: "/businesses", label: "All Businesses" },
+        { to: "/my-businesses", label: "List your business" },
+        { to: "/about", label: "About us" },
+        { to: "/my-reviews", label: "My Reviews" },
+      ]
+    : [
+        { to: "/businesses", label: "All Businesses" },
+        { to: "/about", label: "About us" },
+        { to: "/login", label: "Log in" },
+        { to: "/register", label: "Register" },
+      ];
+
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -23,65 +33,24 @@ export default function Navbar() {
       attributes: true,
       attributeFilter: ["class"],
     });
+
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location.pathname]);
-
-  const alwaysVisibleLinks = [
-    { to: "/businesses", label: "All Businesses" },
-    { to: "/my-businesses", label: "List your business" },
-    { to: "/about", label: "About us" },
-  ];
-
-  const authDependentLinks = currentUser
-    ? [{ to: `/users/${currentUser.id}/reviews`, label: "My Reviews" }]
-    : [
-        { to: "/login", label: "Log in" },
-        { to: "/register", label: "Register" },
-      ];
-
-  const navigationLinks = [...alwaysVisibleLinks, ...authDependentLinks];
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-
   return (
-    <header
-      className="nav-glow fixed top-0 left-0 w-full z-50 backdrop-blur-sm 
-      bg-gradient-aurora bg-aurora-overlay dark:bg-[#2a123c]/70 
-      transition-all duration-700 border-b border-white/20 dark:border-purple-900/40 
-      shadow-md dark:shadow-purple-900/20"
-    >
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-        {/* Logo */}
-        <Link
-          to="/"
-          className="text-2xl font-bold tracking-tight drop-shadow-md transition-colors duration-300"
-          style={{
-            color: isDark ? "#D8B4FE" : "#4F46E5",
-          }}
-        >
-          Local
-          <span
-            style={{
-              color: isDark ? "#C084FC" : "#9333EA",
-            }}
+    <nav className="sticky top-0 z-50 shadow-sm">
+      <div className="relative bg-white/70 dark:bg-gray-900/50 backdrop-blur-xl border-b border-transparent dark:border-white/[0.07] px-6 sm:px-10 py-4 transition-all duration-300">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          {/* Logo */}
+          <Link
+            to="/"
+            className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text"
           >
-            Reviews
-          </span>
-        </Link>
+            LocalReviews
+          </Link>
 
-        <div className="flex items-center gap-4">
-          {/* Desktop Navigation */}
-          <nav
-            className="hidden lg:flex items-center gap-6 transition-colors duration-300"
-            aria-label="Primary navigation"
-          >
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-8">
             {navigationLinks.map((link) => (
               <NavLink
                 key={link.to}
@@ -89,91 +58,83 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   twMerge(
                     "transition-colors duration-300 font-medium text-base",
+
+                    // ACTIVE LINK COLORS
                     isActive
-                      ? "text-indigo-600! dark:text-pink-300"
-                      : "text-slate-900! dark:text-gray-100 hover:text-indigo-500 dark:hover:text-pink-200"
+                      ? "text-indigo-600 dark:text-pink-300"
+
+                      // DEFAULT LINK COLORS (MODIFIED)
+                      : "text-slate-900 dark:text-gray-200 hover:text-indigo-500 dark:hover:text-pink-300"
                   )
                 }
               >
                 {link.label}
               </NavLink>
             ))}
+
+            {/* Logout Button */}
             {currentUser && (
               <button
-                onClick={handleLogout}
-                className="btn-primary px-3 py-1 text-sm shadow-sm"
+                onClick={logout}
+                className="ml-4 px-4 py-2 rounded-full font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition"
               >
                 Logout ({currentUser.username})
               </button>
             )}
-          </nav>
+          </div>
 
           {/* Mobile Menu Button */}
           <button
-            type="button"
-            className="lg:hidden inline-flex items-center justify-center rounded-md border border-white/40 dark:border-purple-900/50 p-2 text-slate-900 dark:text-gray-100 hover:bg-white/20 dark:hover:bg-purple-900/30 transition-all duration-300"
-            aria-label="Toggle navigation menu"
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-nav"
-            onClick={() => setIsMenuOpen((prev) => !prev)}
+            className="md:hidden text-2xl text-slate-900 dark:text-gray-200"
+            onClick={() => setMenuOpen((prev) => !prev)}
           >
-            <span className="sr-only">Open main menu</span>
-            <span className="relative flex flex-col gap-1.5">
-              <span
-                className={`h-0.5 w-6 bg-current transition-transform duration-300 ${
-                  isMenuOpen ? "translate-y-1.5 rotate-45" : ""
-                }`}
-              />
-              <span
-                className={`h-0.5 w-6 bg-current transition-opacity duration-300 ${
-                  isMenuOpen ? "opacity-0" : "opacity-100"
-                }`}
-              />
-              <span
-                className={`h-0.5 w-6 bg-current transition-transform duration-300 ${
-                  isMenuOpen ? "-translate-y-1.5 -rotate-45" : ""
-                }`}
-              />
-            </span>
+            ☰
           </button>
         </div>
-      </div>
 
-      {/* Mobile Navigation */}
-      <div
-        id="mobile-nav"
-        className={`lg:hidden overflow-hidden border-t border-white/20 dark:border-purple-900/40 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md shadow-lg transition-[max-height] duration-300 ${
-          isMenuOpen ? "max-h-[480px]" : "max-h-0"
-        }`}
-        aria-hidden={!isMenuOpen}
-      >
-        <div className="px-6 py-4 flex flex-col gap-3">
-          {navigationLinks.map((link) => (
-            <NavLink
-              key={`mobile-${link.to}`}
-              to={link.to}
-              className={({ isActive }) =>
-                twMerge(
-                  "transition-colors duration-300 font-medium text-lg",
-                  isActive
-                    ? "text-indigo-600 dark:text-pink-300"
-                    : "text-slate-900 dark:text-gray-100 hover:text-indigo-500 dark:hover:text-pink-200"
-                )
-              }
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="md:hidden mt-4 space-y-4 pb-4"
             >
-              {link.label}
-            </NavLink>
-          ))}
-          {currentUser && (
-            <button
-              onClick={handleLogout}
-              className="btn-primary w-full px-4 py-2 text-sm shadow-sm"
-            >
-              Logout ({currentUser.username})
-            </button>
+              {navigationLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    twMerge(
+                      "block text-lg font-medium transition-colors duration-300",
+
+                      isActive
+                        ? "text-indigo-600 dark:text-pink-300"
+                        : "text-slate-900 dark:text-gray-200 hover:text-indigo-500 dark:hover:text-pink-300"
+                    )
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+
+              {currentUser && (
+                <button
+                  onClick={() => {
+                    logout();
+                    setMenuOpen(false);
+                  }}
+                  className="w-full mt-2 px-4 py-2 rounded-full font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition"
+                >
+                  Logout ({currentUser.username})
+                </button>
+              )}
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
-    </header>
+    </nav>
   );
 }
