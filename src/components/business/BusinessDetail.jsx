@@ -129,19 +129,43 @@ export default function BusinessDetail() {
             </div>
 
             <div
-              className="mt-4 text-base font-semibold flex items-center gap-2 transition-colors duration-300"
-              style={{ color: isDark ? "white" : "#111827" }}
+  className="mt-4 text-base font-semibold flex items-center gap-2 transition-colors duration-300"
+  style={{ color: isDark ? "white" : "#111827" }}
+>
+  {/* Star rating display with partial stars */}
+  <div className="flex items-center gap-1">
+    {[1, 2, 3, 4, 5].map((star) => {
+      let fillClass = "text-gray-300 dark:text-gray-600";
+      
+      if (star <= Math.floor(avgRating)) {
+        // Full star
+        fillClass = "fill-yellow-400 text-yellow-400";
+      } else if (star === Math.ceil(avgRating) && avgRating % 1 !== 0) {
+        // Partial star - we'll use a gradient mask
+        fillClass = "text-yellow-400";
+      }
+      
+      return (
+        <div key={star} className="relative">
+          <Star className={`w-5 h-5 ${fillClass}`} />
+          {star === Math.ceil(avgRating) && avgRating % 1 !== 0 && (
+            <div 
+              className="absolute top-0 left-0 overflow-hidden"
+              style={{ width: `${(avgRating % 1) * 100}%` }}
             >
-              <Star
-                className={`w-5 h-5 fill-current ${
-                  isDark ? "text-white" : "text-gray-900"
-                }`}
-              />
-              {avgRating}
-              <span className="text-gray-600 dark:text-gray-300 font-normal">
-                • {bizReviews.length} reviews
-              </span>
+              <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
             </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+  
+  <span className="ml-1">{avgRating}</span>
+  <span className="text-gray-600 dark:text-gray-300 font-normal">
+    • {bizReviews.length} reviews
+  </span>
+</div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
