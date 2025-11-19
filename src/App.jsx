@@ -67,6 +67,15 @@ export default function App() {
               }
             />
             <Route
+              path="/businesses/:businessId/review/:reviewId/edit"
+              element={
+                <ProtectedRoute>
+                  <WriteReviewForm />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
               path="/my-businesses"
               element={
                 <ProtectedRoute>

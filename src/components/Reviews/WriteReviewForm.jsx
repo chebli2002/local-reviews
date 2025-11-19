@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useData } from "../../data/DataContext.jsx";
 
@@ -7,14 +7,20 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function WriteReviewForm() {
-  const { id } = useParams();
+  const { id } = useParams(); // business id
+  const [searchParams] = useSearchParams();
+  const editReviewId = searchParams.get("edit"); // if exists -> edit mode
+
   const navigate = useNavigate();
-  const { businesses } = useData();
+  const { businesses, currentUser } = useData();
+
   const business = businesses.find((b) => b.id === id);
+
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
 
+  // Watch dark mode changes
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -30,6 +36,34 @@ export default function WriteReviewForm() {
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
 
+  // ---------------------------------------------
+  // LOAD EXISTING REVIEW IF IN EDIT MODE
+  // ---------------------------------------------
+  useEffect(() => {
+    async function loadExistingReview() {
+      if (!editReviewId) return;
+
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/api/reviews/user/${currentUser.id}`
+        );
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message);
+
+        const found = data.find((r) => r._id === editReviewId);
+        if (!found) return;
+
+        setRating(found.rating);
+        setComment(found.comment);
+      } catch (err) {
+        console.error("Failed to load review:", err);
+      }
+    }
+
+    if (currentUser) loadExistingReview();
+  }, [editReviewId, currentUser]);
+
   if (!business)
     return (
       <div className="text-center text-gray-600 dark:text-white mt-20 text-lg">
@@ -37,6 +71,9 @@ export default function WriteReviewForm() {
       </div>
     );
 
+  // ---------------------------------------------
+  // SUBMIT HANDLER
+  // ---------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -50,22 +87,34 @@ export default function WriteReviewForm() {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("You must be logged in.");
 
-      const res = await fetch(`${API_BASE_URL}/api/reviews`, {
-        method: "POST",
+      let url = `${API_BASE_URL}/api/reviews`;
+      let method = "POST";
+      let body = {
+        business_id: id,
+        rating,
+        comment,
+      };
+
+      if (editReviewId) {
+        // EDIT MODE
+        url = `${API_BASE_URL}/api/reviews/${editReviewId}`;
+        method = "PUT";
+        body = { rating, comment }; // backend ONLY accepts these for editing
+      }
+
+      const res = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          business_id: id,
-          rating,
-          comment,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to submit review.");
 
+      // Go back to business page
       navigate(`/businesses/${id}`);
     } catch (err) {
       setError(err.message || "Failed to submit review.");
@@ -85,7 +134,7 @@ export default function WriteReviewForm() {
             className="text-3xl font-extrabold mb-2 text-center transition-colors duration-300"
             style={{ color: isDark ? "white" : "#111827" }}
           >
-            Write a Review
+            {editReviewId ? "Edit Review" : "Write a Review"}
           </h1>
           <p className="text-gray-700 dark:text-gray-300 mb-8 text-center">
             for{" "}
@@ -101,7 +150,7 @@ export default function WriteReviewForm() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Rating Input */}
+            {/* Rating */}
             <div className="text-center">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Rating
@@ -126,7 +175,7 @@ export default function WriteReviewForm() {
               </div>
             </div>
 
-            {/* Comment Input */}
+            {/* Comment */}
             <div>
               <label
                 htmlFor="comment"
@@ -144,13 +193,13 @@ export default function WriteReviewForm() {
               />
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-lg shadow-md hover:shadow-xl transition-all duration-300"
             >
-              Submit Review
+              {editReviewId ? "Update Review" : "Submit Review"}
             </motion.button>
           </form>
         </div>
