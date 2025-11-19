@@ -1,11 +1,9 @@
-// backend/controllers/reviewController.js
 import Review from "../models/Review.js";
 import Business from "../models/Business.js";
 
 /**
  * POST /api/reviews
  * Create a review (auth required)
- * Expects body: { business_id, rating, comment }
  */
 export async function createReview(req, res) {
   try {
@@ -31,7 +29,7 @@ export async function createReview(req, res) {
 
     const review = await Review.create({
       business: business._id,
-      user: req.user._id, // from authRequired middleware
+      user: req.user._id,
       rating: numericRating,
       comment,
     });
@@ -47,7 +45,6 @@ export async function createReview(req, res) {
 
 /**
  * GET /api/reviews/business/:businessId
- * Get all reviews for a given business (public)
  */
 export async function getReviewsForBusiness(req, res) {
   try {
@@ -67,7 +64,6 @@ export async function getReviewsForBusiness(req, res) {
 
 /**
  * GET /api/reviews/user/:userId
- * Get all reviews written by a specific user (public)
  */
 export async function getReviewsForUser(req, res) {
   try {
@@ -86,8 +82,53 @@ export async function getReviewsForUser(req, res) {
 }
 
 /**
+ * PUT /api/reviews/:id
+ * Edit a review (only the author can edit)
+ */
+export async function updateReview(req, res) {
+  try {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+
+    const review = await Review.findById(id);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    if (review.user.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Not allowed to edit this review" });
+    }
+
+    if (rating != null) {
+      const numericRating = Number(rating);
+      if (numericRating < 1 || numericRating > 5) {
+        return res.status(400).json({ message: "Rating must be 1–5" });
+      }
+      review.rating = numericRating;
+    }
+
+    if (comment != null) {
+      if (!comment.trim()) {
+        return res.status(400).json({ message: "Comment cannot be empty" });
+      }
+      review.comment = comment.trim();
+    }
+
+    await review.save();
+
+    const populated = await review.populate("user", "username email");
+
+    res.json(populated);
+  } catch (err) {
+    console.error("updateReview error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+/**
  * DELETE /api/reviews/:id
- * Delete a review (only the author can delete)
  */
 export async function deleteReview(req, res) {
   try {
