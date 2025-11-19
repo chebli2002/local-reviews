@@ -117,7 +117,7 @@ export default function Home() {
             </Link>
             <Link
               to={currentUser ? "/businesses/new" : "/login"}
-              className="px-8 py-4 text-lg rounded-full border border-white/60 dark:border-gray-700/60 text-gray-900 dark:text-white hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all duration-300"
+             className="px-8 py-4 text-lg rounded-full border border-white/60 dark:border-purple-500 text-gray-900 dark:text-white hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all duration-300"
             >
               List your business
             </Link>
