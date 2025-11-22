@@ -140,15 +140,15 @@ export default function MyBusinesses() {
                 }}
                 className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border"
               >
-                <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-white/85 dark:hover:bg-gray-800/85 transition-all duration-500 shadow-lg hover:shadow-2xl">
-                  <div className="flex-1">
+                <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row items-center gap-6 hover:bg-white/85 dark:hover:bg-gray-800/85 transition-all duration-500 shadow-lg hover:shadow-2xl md:h-40">
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
                     <Link
                       to={`/businesses/${b.id}`}
                       className="text-2xl font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                     >
                       {b.name}
                     </Link>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                       {b.address}
                     </p>
 
@@ -167,7 +167,7 @@ export default function MyBusinesses() {
                     </div>
                   </div>
 
-                  <div className="flex gap-3 items-end md:items-center justify-end">
+                  <div className="flex gap-3 items-center flex-shrink-0">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -191,6 +191,19 @@ export default function MyBusinesses() {
                       </button>
                     </motion.div>
                   </div>
+
+                  {/* Business Image - Far Right */}
+                  {b.photos && b.photos.length > 0 ? (
+                    <div className="hidden md:block w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden border border-white/60 dark:border-gray-700/60">
+                      <img
+                        src={b.photos[0]}
+                        alt={b.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="hidden md:block w-32 h-32 flex-shrink-0"></div>
+                  )}
                 </div>
               </motion.div>
             ))
