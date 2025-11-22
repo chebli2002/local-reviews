@@ -11,9 +11,18 @@ const API_BASE_URL =
 // STATIC CATEGORIES (must remain since backend has no categories)
 // ----------------------------------------------
 const categoriesSeed = [
-  { id: "cat-food", name: "Food & Drink" },
+  { id: "cat-restaurant", name: "Restaurant" },
+  { id: "cat-cafe", name: "Cafe" },
+  { id: "cat-retail", name: "Retail" },
   { id: "cat-fitness", name: "Fitness" },
   { id: "cat-services", name: "Services" },
+  { id: "cat-beauty", name: "Beauty & Spa" },
+  { id: "cat-healthcare", name: "Healthcare" },
+  { id: "cat-education", name: "Education" },
+  { id: "cat-entertainment", name: "Entertainment" },
+  { id: "cat-automotive", name: "Automotive" },
+  // Legacy categories for backward compatibility
+  { id: "cat-food", name: "Food & Drink" },
 ];
 
 // ----------------------------------------------
@@ -73,22 +82,29 @@ export function DataProvider({ children }) {
   // ----------------------------------------------
   // LOAD BUSINESSES FROM BACKEND
   // ----------------------------------------------
-  const refreshBusinesses = async () => {
+  const refreshBusinesses = async (page = 1, limit = 10) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/businesses`);
+      const res = await fetch(
+        `${API_BASE_URL}/api/businesses?page=${page}&limit=${limit}`
+      );
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || "Failed to load businesses");
 
-      const normalized = data.map((b) => normalizeBusiness(b));
+      const normalized = (data.businesses || data).map((b) =>
+        normalizeBusiness(b)
+      );
       setBusinesses(normalized);
+      return data.pagination || null;
     } catch (err) {
       console.error("Failed to load businesses:", err.message);
+      return null;
     }
   };
 
   useEffect(() => {
-    refreshBusinesses();
+    // Load more businesses initially for better UX
+    refreshBusinesses(1, 50);
   }, []);
 
   // ----------------------------------------------

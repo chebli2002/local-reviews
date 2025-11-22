@@ -5,10 +5,23 @@ import Review from "../models/Review.js";
 /**
  * GET /api/businesses
  * Public - returns list of all businesses with review_count + average_rating
+ * Supports pagination: ?page=1&limit=10
  */
 export async function getAllBusinesses(req, res) {
   try {
-    const businesses = await Business.find().lean();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Validate pagination params
+    if (page < 1 || limit < 1 || limit > 100) {
+      return res.status(400).json({
+        message: "Invalid pagination parameters. Page must be >= 1, limit must be between 1 and 100",
+      });
+    }
+
+    const total = await Business.countDocuments();
+    const businesses = await Business.find().skip(skip).limit(limit).lean();
 
     const businessesWithStats = await Promise.all(
       businesses.map(async (b) => {
@@ -27,7 +40,17 @@ export async function getAllBusinesses(req, res) {
       })
     );
 
-    res.json(businessesWithStats);
+    res.json({
+      businesses: businessesWithStats,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
+    });
   } catch (err) {
     console.error("getAllBusinesses error:", err);
     res.status(500).json({ message: "Server error" });

@@ -160,7 +160,7 @@ export default function BusinessForm({ isEdit = false }) {
   );
 
   return (
-    <section className="min-h-[90vh] flex items-center justify-center px-6">
+    <section className="min-h-[90vh] flex items-center justify-center px-6 pt-24 pb-8">
       <motion.div
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}

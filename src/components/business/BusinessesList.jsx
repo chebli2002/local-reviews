@@ -11,7 +11,7 @@ function useQuery() {
 }
 
 export default function BusinessesList() {
-  const { businesses, categories, currentUser, deleteBusiness } = useData();
+  const { businesses, categories, currentUser, deleteBusiness, refreshBusinesses } = useData();
   const qs = useQuery();
 
   const [term, setTerm] = useState(qs.get("q") || "");
@@ -20,6 +20,9 @@ export default function BusinessesList() {
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // store the FULL business object for the confirmation modal
   const [confirmBusiness, setConfirmBusiness] = useState(null);
@@ -35,6 +38,25 @@ export default function BusinessesList() {
     });
     return () => observer.disconnect();
   }, []);
+
+  // Load businesses with pagination
+  useEffect(() => {
+    const loadBusinesses = async () => {
+      setLoading(true);
+      const paginationData = await refreshBusinesses(currentPage, 10);
+      setPagination(paginationData);
+      setLoading(false);
+    };
+    loadBusinesses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [term, cat, sort]);
 
   const filtered = businesses
     .filter(
@@ -177,16 +199,20 @@ export default function BusinessesList() {
       )}
 
       {/* Results Count */}
-      {filtered.length > 0 && (
+      {!loading && pagination && (
         <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-          Showing {filtered.length}{" "}
-          {filtered.length === 1 ? "business" : "businesses"}
+          Showing {((currentPage - 1) * pagination.limit) + 1} - {Math.min(currentPage * pagination.limit, pagination.total)} of {pagination.total}{" "}
+          {pagination.total === 1 ? "business" : "businesses"}
         </p>
       )}
 
       {/* Business Cards */}
       <div className="grid md:grid-cols-2 gap-8">
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="col-span-2 flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
+          </div>
+        ) : filtered.length > 0 ? (
           filtered.map((b, i) => (
             <motion.div
               key={b.id}
@@ -199,15 +225,15 @@ export default function BusinessesList() {
               }}
               className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border"
             >
-              <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-white/85 dark:hover:bg-gray-800/85 transition-all duration-500 shadow-lg hover:shadow-2xl">
-                <div className="flex-1">
+              <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row items-center gap-6 hover:bg-white/85 dark:hover:bg-gray-800/85 transition-all duration-500 shadow-lg hover:shadow-2xl md:h-40">
+                <div className="flex-1 min-w-0 flex flex-col justify-center">
                   <Link
                     to={`/businesses/${b.id}`}
                     className="text-2xl font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   >
                     {b.name}
                   </Link>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                     {b.address}
                   </p>
 
@@ -226,7 +252,7 @@ export default function BusinessesList() {
                   </div>
                 </div>
 
-                <div className="flex gap-3 items-end md:items-center justify-end">
+                <div className="flex gap-3 items-center flex-shrink-0">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -260,6 +286,19 @@ export default function BusinessesList() {
                     </motion.button>
                   )}
                 </div>
+
+                {/* Business Image - Far Right */}
+                {b.photos && b.photos.length > 0 ? (
+                  <div className="hidden md:block w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden border border-white/60 dark:border-gray-700/60">
+                    <img
+                      src={b.photos[0]}
+                      alt={b.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="hidden md:block w-32 h-32 flex-shrink-0"></div>
+                )}
               </div>
             </motion.div>
           ))
@@ -305,6 +344,56 @@ export default function BusinessesList() {
           </motion.div>
         )}
       </div>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && !loading && (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={!pagination.hasPrev || loading}
+            className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            Previous
+          </button>
+
+          <div className="flex items-center gap-2">
+            {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+              let pageNum;
+              if (pagination.totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= pagination.totalPages - 2) {
+                pageNum = pagination.totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`px-4 py-2 rounded-lg border transition-colors ${
+                    pageNum === currentPage
+                      ? "bg-indigo-600 text-white border-indigo-600"
+                      : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))}
+            disabled={!pagination.hasNext || loading}
+            className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Delete confirmation modal */}
       {confirmBusiness && (

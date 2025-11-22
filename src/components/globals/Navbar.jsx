@@ -33,14 +33,17 @@ export default function Navbar() {
   const alwaysVisibleLinks = [
     { to: "/businesses", label: "All Businesses" },
     { to: "/my-businesses", label: "List your business" },
-    { to: "/about", label: "About us" },
   ];
 
   const authDependentLinks = currentUser
-    ? [{ to: `/users/${currentUser.id}/reviews`, label: "My Reviews" }]
+    ? [
+        { to: `/users/${currentUser.id}/reviews`, label: "My Reviews" },
+        { to: "/about", label: "About us" },
+      ]
     : [
         { to: "/login", label: "Log in" },
         { to: "/register", label: "Register" },
+        { to: "/about", label: "About us" },
       ];
 
   const navigationLinks = [...alwaysVisibleLinks, ...authDependentLinks];
@@ -168,8 +171,8 @@ export default function Navbar() {
                         ? "#F9A8FF"
                         : "#FFFFFF"
                       : isActive
-                      ? "#4F46E5"
-                      : "#111827",
+                      ? "#F9A8FF"
+                      : "#FFFFFF",
                   }}
                 >
                   {link.label}

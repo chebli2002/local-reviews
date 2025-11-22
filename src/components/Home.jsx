@@ -45,12 +45,26 @@ export default function Home() {
   };
 
   const categoryImages = {
-    "Food & Drink":
+    Restaurant:
       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
+    Cafe:
+      "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80",
+    Retail:
+      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80",
     Fitness:
       "https://images.unsplash.com/photo-1554284126-aa88f22d8b74?auto=format&fit=crop&w=1200&q=80",
     Services:
       "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
+    "Beauty & Spa":
+      "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=1200&q=80",
+    Healthcare:
+      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?auto=format&fit=crop&w=1200&q=80",
+    Education:
+      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80",
+    Entertainment:
+      "https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=1200&q=80",
+    Automotive:
+      "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=80",
   };
 
   return (
@@ -143,7 +157,7 @@ export default function Home() {
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
             {categories.map((c, i) => {
-              const img = categoryImages[c.name] || categoryImages["Services"];
+              const img = categoryImages[c.name] || categoryImages["Retail"];
               return (
                 <motion.div
                   key={c.id}
@@ -208,8 +222,8 @@ export default function Home() {
                 }}
                 className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border"
               >
-                <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500">
-                  <div className="flex-1">
+                <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row items-center gap-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500 shadow-lg hover:shadow-2xl md:h-40">
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
                     <Link
                       to={`/businesses/${b.id}`}
                       className="text-2xl font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
@@ -220,19 +234,22 @@ export default function Home() {
                       {b.address}
                     </p>
 
-                    <div className="mt-3 flex items-center gap-2">
+                    <div className="mt-3 flex items-center gap-3 flex-wrap">
                       <RatingStars
                         rating={b.average_rating}
                         size={16}
                         className="text-gray-900 dark:text-white"
                       />
-                      <span className="text-gray-600 dark:text-gray-300 text-sm">
-                        • {b.review_count} reviews
-                      </span>
+                      {b.review_count > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium">
+                          {b.review_count}{" "}
+                          {b.review_count === 1 ? "review" : "reviews"}
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex gap-3 items-end md:items-center justify-end">
+                  <div className="flex gap-3 items-center flex-shrink-0">
                     <Link
                       to={`/businesses/${b.id}`}
                       className="btn-outline px-4 py-2"
@@ -246,6 +263,19 @@ export default function Home() {
                       Review
                     </Link>
                   </div>
+
+                  {/* Business Image - Far Right */}
+                  {b.photos && b.photos.length > 0 ? (
+                    <div className="hidden md:block w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden border border-white/60 dark:border-gray-700/60">
+                      <img
+                        src={b.photos[0]}
+                        alt={b.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="hidden md:block w-32 h-32 flex-shrink-0"></div>
+                  )}
                 </div>
               </motion.div>
             ))}
