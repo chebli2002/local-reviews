@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { useData } from "../../data/DataContext.jsx";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 export default function UserReviews() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -44,7 +47,7 @@ export default function UserReviews() {
         setLoading(true);
         setError("");
 
-        const res = await fetch(`http://localhost:5000/api/reviews/user/${id}`);
+        const res = await fetch(`${API_BASE_URL}/api/reviews/user/${id}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to load reviews.");
 
@@ -84,7 +87,7 @@ export default function UserReviews() {
     try {
       const token = localStorage.getItem("authToken");
       const res = await fetch(
-        `http://localhost:5000/api/reviews/${reviewToDelete}`,
+        `${API_BASE_URL}/api/reviews/${reviewToDelete}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
