@@ -109,7 +109,7 @@ export default function BusinessDetail() {
     }
   };
   return (
-    <section className="max-w-4xl mx-auto px-6 py-14 space-y-10">
+    <section className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-14 space-y-6 sm:space-y-10">
       {/* Top card with name / rating / buttons */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -117,10 +117,10 @@ export default function BusinessDetail() {
         transition={{ duration: 0.6 }}
         className="relative overflow-hidden p-[2px] rounded-3xl bg-gradient-border shadow-lg"
       >
-        <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-4 sm:p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
           <div className="flex-1">
             <h1
-              className="text-4xl font-extrabold mb-2 tracking-tight transition-colors duration-300"
+              className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2 tracking-tight transition-colors duration-300 break-words"
               style={{ color: isDark ? "white" : "#111827" }}
             >
               {business.name}
@@ -218,7 +218,7 @@ export default function BusinessDetail() {
           </div>
 
           {/* ACTION BUTTONS */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
             <Link
               to={`/businesses/${business.id}/review`}
               className="btn-primary text-center text-base"
@@ -322,7 +322,7 @@ export default function BusinessDetail() {
             Photos
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
             {photos.map((src, index) => (
               <div
                 key={index}

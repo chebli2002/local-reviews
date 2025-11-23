@@ -111,7 +111,7 @@ export default function UserReviews() {
   // RENDER
   // ------------------------------------------
   return (
-    <section className="min-h-[90vh] flex flex-col items-center px-6 py-16">
+    <section className="min-h-[90vh] flex flex-col items-center px-4 sm:px-6 py-8 sm:py-16">
       <motion.div
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
@@ -119,12 +119,12 @@ export default function UserReviews() {
         className="max-w-4xl w-full text-center"
       >
         <h1
-          className="text-4xl font-extrabold mb-2 transition-colors duration-300"
+          className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2 transition-colors duration-300"
           style={{ color: isDark ? "white" : "#111827" }}
         >
           Your Reviews
         </h1>
-        <p className="text-gray-700 dark:text-gray-300 text-lg mb-10">
+        <p className="text-gray-700 dark:text-gray-300 text-base sm:text-lg mb-6 sm:mb-10">
           See all the reviews you have written.
         </p>
       </motion.div>
@@ -142,7 +142,7 @@ export default function UserReviews() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="grid sm:grid-cols-2 gap-8 max-w-5xl w-full"
+          className="grid sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8 max-w-5xl w-full"
         >
           {reviews.map((r, i) => (
             <motion.div
@@ -157,12 +157,12 @@ export default function UserReviews() {
               }}
               className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border shadow-md"
             >
-              <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 h-full flex flex-col justify-between transition-all duration-500">
+              <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-4 sm:p-6 h-full flex flex-col justify-between transition-all duration-500">
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <Link
                       to={`/businesses/${r.business_id}`}
-                      className="text-xl font-semibold text-indigo-700 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                      className="text-lg sm:text-xl font-semibold text-indigo-700 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors break-words"
                     >
                       {r.business?.name ?? "Business"}
                     </Link>
@@ -176,7 +176,7 @@ export default function UserReviews() {
                     </div>
                   </div>
 
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base mb-4">
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm sm:text-base mb-4 break-words">
                     {r.comment}
                   </p>
 
@@ -186,7 +186,7 @@ export default function UserReviews() {
                 </div>
 
                 {/* BUTTONS */}
-                <div className="flex justify-end gap-3 mt-4">
+                <div className="flex justify-end gap-2 sm:gap-3 mt-4 flex-wrap">
                   <button
                     onClick={() =>
                       navigate(

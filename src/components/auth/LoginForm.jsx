@@ -38,16 +38,16 @@ export default function LoginForm() {
   };
 
   return (
-    <section className="min-h-[90vh] flex items-center justify-center px-6">
+    <section className="min-h-[90vh] flex items-center justify-center px-4 sm:px-6 py-8">
       <motion.div
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative w-full max-w-md p-[2px] rounded-3xl bg-gradient-border shadow-2xl"
       >
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-3xl p-8">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-3xl p-4 sm:p-6 md:p-8">
           <h1
-            className="text-3xl font-extrabold mb-6 text-center transition-colors duration-300"
+            className="text-2xl sm:text-3xl font-extrabold mb-4 sm:mb-6 text-center transition-colors duration-300"
             style={{ color: isDark ? "white" : "#111827" }}
           >
             Welcome Back
@@ -59,7 +59,7 @@ export default function LoginForm() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div>
               <label
                 htmlFor="email"

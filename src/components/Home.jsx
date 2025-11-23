@@ -71,7 +71,7 @@ export default function Home() {
     <div className="relative min-h-screen text-gray-900 dark:text-white">
       <div className="pointer-events-none absolute inset-0 aurora-shimmer" />
 
-      <div className="relative z-10 px-6 py-20 space-y-28">
+      <div className="relative z-10 px-4 sm:px-6 py-12 sm:py-20 space-y-16 sm:space-y-28">
         {/* HERO */}
         <section className="min-h-[80vh] flex flex-col items-center justify-center text-center gap-8">
           <motion.p
@@ -155,7 +155,7 @@ export default function Home() {
             Popular Categories
           </h2>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {categories.map((c, i) => {
               const img = categoryImages[c.name] || categoryImages["Retail"];
               return (
@@ -209,7 +209,7 @@ export default function Home() {
             Top Rated
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-4 md:gap-8">
             {top.map((b, i) => (
               <motion.div
                 key={b.id}
@@ -222,19 +222,30 @@ export default function Home() {
                 }}
                 className="relative overflow-hidden rounded-3xl p-[2px] bg-gradient-border"
               >
-                <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-6 flex flex-col md:flex-row items-center gap-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500 shadow-lg hover:shadow-2xl md:h-40">
-                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                <div className="rounded-3xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-4 md:p-6 flex flex-col md:flex-row items-start gap-4 md:gap-6 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500 shadow-lg hover:shadow-2xl">
+                  {/* Business Image - Show on mobile too */}
+                  {b.photos && b.photos.length > 0 ? (
+                    <div className="w-full md:w-32 h-48 md:h-32 flex-shrink-0 rounded-xl overflow-hidden border border-white/60 dark:border-gray-700/60 md:order-3">
+                      <img
+                        src={b.photos[0]}
+                        alt={b.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : null}
+
+                  <div className="flex-1 min-w-0 flex flex-col justify-start w-full md:w-auto">
                     <Link
                       to={`/businesses/${b.id}`}
-                      className="text-2xl font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                      className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors break-words"
                     >
                       {b.name}
                     </Link>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 break-words">
                       {b.address}
                     </p>
 
-                    <div className="mt-3 flex items-center gap-3 flex-wrap">
+                    <div className="mt-3 flex items-center gap-2 md:gap-3 flex-wrap">
                       <RatingStars
                         rating={b.average_rating}
                         size={16}
@@ -249,33 +260,20 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="flex gap-3 items-center flex-shrink-0">
+                  <div className="flex gap-2 md:gap-3 items-center md:items-start flex-shrink-0 w-full md:w-auto justify-end md:justify-start md:order-2">
                     <Link
                       to={`/businesses/${b.id}`}
-                      className="btn-outline px-4 py-2"
+                      className="btn-outline px-3 md:px-4 py-2 text-sm md:text-base"
                     >
                       View
                     </Link>
                     <Link
                       to={`/businesses/${b.id}/review`}
-                      className="btn-primary px-4 py-2"
+                      className="btn-primary px-3 md:px-4 py-2 text-sm md:text-base"
                     >
                       Review
                     </Link>
                   </div>
-
-                  {/* Business Image - Far Right */}
-                  {b.photos && b.photos.length > 0 ? (
-                    <div className="hidden md:block w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden border border-white/60 dark:border-gray-700/60">
-                      <img
-                        src={b.photos[0]}
-                        alt={b.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="hidden md:block w-32 h-32 flex-shrink-0"></div>
-                  )}
                 </div>
               </motion.div>
             ))}
