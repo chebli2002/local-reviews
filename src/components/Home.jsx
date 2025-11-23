@@ -156,9 +156,11 @@ export default function Home() {
           </h2>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-            {categories.map((c, i) => {
-              const img = categoryImages[c.name] || categoryImages["Retail"];
-              return (
+            {categories
+              .filter((c) => c.name !== "Food & Drink")
+              .map((c, i) => {
+                const img = categoryImages[c.name] || categoryImages["Retail"];
+                return (
                 <motion.div
                   key={c.id}
                   initial={{ opacity: 0, y: 24 }}
