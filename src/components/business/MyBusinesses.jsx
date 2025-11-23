@@ -6,7 +6,8 @@ import RatingStars from "./RatingStars.jsx";
 import { useData } from "../../data/DataContext.jsx";
 
 export default function MyBusinesses() {
-  const { businesses, currentUser, deleteBusiness } = useData();
+  const { businesses, currentUser, deleteBusiness, refreshBusinesses } =
+    useData();
   const navigate = useNavigate();
 
   const [isDark, setIsDark] = useState(
@@ -14,6 +15,18 @@ export default function MyBusinesses() {
   );
   const [term, setTerm] = useState("");
   const [confirmBusiness, setConfirmBusiness] = useState(null);
+
+  // Always refresh a full list when opening "My Businesses"
+  useEffect(() => {
+    (async () => {
+      try {
+        await refreshBusinesses(1, 50);
+      } catch (err) {
+        console.error("Failed to refresh businesses for MyBusinesses:", err);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Watch dark mode changes (same pattern as other pages)
   useEffect(() => {

@@ -42,9 +42,11 @@ function normalizeBusiness(b) {
   if (!b) return b;
 
   const id = b.id || b._id;
-  let owner_id = b.owner_id;
 
-  // Ensure owner_id is always a string rather than an object
+  // Support both owner_id and owner (old records)
+  let owner_id = b.owner_id || b.owner;
+
+  // If owner_id is an object (populated user), extract its ID
   if (owner_id && typeof owner_id === "object") {
     owner_id = owner_id._id || owner_id.id;
   }
@@ -56,7 +58,6 @@ function normalizeBusiness(b) {
     owner_id,
   };
 }
-
 // ----------------------------------------------
 // PROVIDER
 // ----------------------------------------------
@@ -89,7 +90,7 @@ export function DataProvider({ children }) {
   // ----------------------------------------------
   // LOAD BUSINESSES FROM BACKEND
   // ----------------------------------------------
-  const refreshBusinesses = async (page = 1, limit = 10) => {
+  const refreshBusinesses = async (page = 1, limit = 50) => {
     try {
       const res = await fetch(
         `${API_BASE_URL}/api/businesses?page=${page}&limit=${limit}`
@@ -110,7 +111,6 @@ export function DataProvider({ children }) {
   };
 
   useEffect(() => {
-    // Load more businesses initially for better UX
     refreshBusinesses(1, 50);
   }, []);
 
@@ -276,8 +276,19 @@ export function DataProvider({ children }) {
   // GET USER REVIEWS
   // ----------------------------------------------
   const getUserReviews = async (userId) => {
-    const res = await fetch(`${API_BASE_URL}/api/reviews/user/${userId}`);
-    return await res.json();
+    const token = localStorage.getItem("authToken");
+
+    const res = await fetch(`${API_BASE_URL}/api/reviews/user/${userId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to load reviews");
+    }
+
+    return data;
   };
 
   // ----------------------------------------------

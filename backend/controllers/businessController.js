@@ -16,7 +16,8 @@ export async function getAllBusinesses(req, res) {
     // Validate pagination params
     if (page < 1 || limit < 1 || limit > 100) {
       return res.status(400).json({
-        message: "Invalid pagination parameters. Page must be >= 1, limit must be between 1 and 100",
+        message:
+          "Invalid pagination parameters. Page must be >= 1, limit must be between 1 and 100",
       });
     }
 
@@ -63,12 +64,15 @@ export async function getAllBusinesses(req, res) {
  */
 export async function getBusinessById(req, res) {
   try {
-    const business = await Business.findById(req.params.id).lean();
+    const business = await Business.findById(req.params.id)
+      .populate("owner_id", "username email")
+      .lean();
 
     if (!business) {
       return res.status(404).json({ message: "Business not found" });
     }
 
+    // reviews MUST match your Review model field
     const reviews = await Review.find({ business: business._id })
       .populate("user", "username email")
       .lean();
@@ -112,6 +116,9 @@ export async function createBusiness(req, res) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    // ✅ support both req.user._id and req.user.id
+    const ownerId = req.user._id || req.user.id;
+
     const business = await Business.create({
       name,
       description,
@@ -119,7 +126,7 @@ export async function createBusiness(req, res) {
       phone,
       website,
       category_id,
-      owner_id: req.user._id, // from auth middleware
+      owner_id: ownerId,
       google_map_url,
       photos,
     });

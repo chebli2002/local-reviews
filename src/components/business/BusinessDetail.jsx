@@ -16,7 +16,19 @@ export default function BusinessDetail() {
     document.documentElement.classList.contains("dark")
   );
 
-  // Watch dark mode changes
+  // reviews state
+  const [bizReviews, setBizReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+
+  // business state (from context OR backend)
+  const [business, setBusiness] = useState(null);
+  const [loadingBusiness, setLoadingBusiness] = useState(true);
+
+  // modals
+  const [showConfirmBizDelete, setShowConfirmBizDelete] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState(null);
+
+  // watch dark mode changes
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -29,11 +41,8 @@ export default function BusinessDetail() {
   }, []);
 
   // ----------------------------------------
-  // REVIEWS (always fetched from backend)
+  // LOAD REVIEWS
   // ----------------------------------------
-  const [bizReviews, setBizReviews] = useState([]);
-  const [loadingReviews, setLoadingReviews] = useState(true);
-
   async function fetchReviews() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/reviews/business/${id}`);
@@ -51,10 +60,47 @@ export default function BusinessDetail() {
   }
 
   useEffect(() => {
+    setLoadingReviews(true);
     fetchReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const business = businesses.find((b) => b.id === id);
+  // ----------------------------------------
+  // LOAD BUSINESS (from context OR backend)
+  // ----------------------------------------
+  useEffect(() => {
+    async function loadBusiness() {
+      // 1) try from context
+      const fromContext = businesses.find((b) => b.id === id || b._id === id);
+      if (fromContext) {
+        setBusiness(fromContext);
+        setLoadingBusiness(false);
+        return;
+      }
+
+      // 2) fallback: fetch from backend
+      try {
+        setLoadingBusiness(true);
+        const res = await fetch(`${API_BASE_URL}/api/businesses/${id}`);
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message || "Failed to load business");
+
+        setBusiness({
+          ...data,
+          id: data.id || data._id,
+          _id: data._id || data.id,
+        });
+      } catch (err) {
+        console.error("Failed to load business:", err.message);
+        setBusiness(null);
+      } finally {
+        setLoadingBusiness(false);
+      }
+    }
+
+    loadBusiness();
+  }, [id, businesses]);
 
   const avgRating =
     bizReviews.length > 0
@@ -65,20 +111,24 @@ export default function BusinessDetail() {
         ) / 10
       : business?.average_rating ?? 0;
 
-  if (!business)
+  if (loadingBusiness) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-20 text-center text-gray-600 dark:text-white">
+        Loading business...
+      </div>
+    );
+  }
+
+  if (!business) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-20 text-center text-gray-600 dark:text-white">
         Business not found.
       </div>
     );
+  }
 
   const hasMap = !!business.google_map_url;
   const photos = business.photos || [];
-
-  // ----------------------------------------
-  // BUSINESS DELETE MODAL
-  // ----------------------------------------
-  const [showConfirmBizDelete, setShowConfirmBizDelete] = useState(false);
 
   const handleDeleteBusinessConfirmed = async () => {
     try {
@@ -90,11 +140,6 @@ export default function BusinessDetail() {
       alert(err.message || "Failed to delete business");
     }
   };
-
-  // ----------------------------------------
-  // REVIEW DELETE MODAL
-  // ----------------------------------------
-  const [reviewToDelete, setReviewToDelete] = useState(null);
 
   const handleDeleteReviewConfirmed = async () => {
     if (!reviewToDelete) return;
@@ -108,6 +153,7 @@ export default function BusinessDetail() {
       alert(err.message || "Failed to delete review");
     }
   };
+
   return (
     <section className="max-w-4xl mx-auto px-6 py-14 space-y-10">
       {/* Top card with name / rating / buttons */}
@@ -129,7 +175,6 @@ export default function BusinessDetail() {
               {business.address}
             </p>
 
-            {/* Phone + Website */}
             <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               <span className="flex items-center gap-1">
                 <svg
@@ -338,9 +383,8 @@ export default function BusinessDetail() {
           </div>
         </motion.div>
       )}
-      {/* ----------------------------------------
-          CUSTOMER REVIEWS + Edit/Delete controls
-      ---------------------------------------- */}
+
+      {/* Customer Reviews */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -373,7 +417,6 @@ export default function BusinessDetail() {
                   — {r.user?.username || "Anonymous"} • {r.rating}★
                 </p>
 
-                {/* REVIEW ACTION BUTTONS */}
                 {currentUser && currentUser.id === r.user?._id && (
                   <div className="flex gap-3 mt-2">
                     <Link
@@ -397,9 +440,7 @@ export default function BusinessDetail() {
         )}
       </motion.div>
 
-      {/* ----------------------------------------
-          BUSINESS DELETE MODAL
-      ---------------------------------------- */}
+      {/* BUSINESS DELETE MODAL */}
       {showConfirmBizDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="max-w-sm w-full mx-4 rounded-2xl bg-white dark:bg-gray-800 shadow-xl p-6 border border-white/60 dark:border-gray-700/60">
@@ -430,9 +471,8 @@ export default function BusinessDetail() {
           </div>
         </div>
       )}
-      {/* ----------------------------------------
-          REVIEW DELETE MODAL (same design)
-      ---------------------------------------- */}
+
+      {/* REVIEW DELETE MODAL */}
       {reviewToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="max-w-sm w-full mx-4 rounded-2xl bg-white dark:bg-gray-800 shadow-xl p-6 border border-white/60 dark:border-gray-700/60">
