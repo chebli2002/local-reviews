@@ -7,7 +7,10 @@ import { useData } from "../../data/DataContext.jsx";
 export default function UserReviews() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { currentUser, businesses } = useData();
+
+  // pull everything we need from context
+  const { currentUser, businesses, getUserReviews, deleteReview, authReady } =
+    useData();
 
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
@@ -39,14 +42,16 @@ export default function UserReviews() {
   const [reviewToDelete, setReviewToDelete] = useState(null);
 
   useEffect(() => {
+    // wait until auth has finished loading from localStorage
+    if (!authReady) return;
+    if (!id) return;
+
     async function fetchUserReviews() {
       try {
         setLoading(true);
         setError("");
 
-        const res = await fetch(`http://localhost:5000/api/reviews/user/${id}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Failed to load reviews.");
+        const data = await getUserReviews(id); // 🔥 uses API_BASE_URL internally
 
         const merged = data.map((r) => {
           const businessId =
@@ -68,12 +73,12 @@ export default function UserReviews() {
     }
 
     fetchUserReviews();
-  }, [id, businesses]);
+  }, [id, businesses, getUserReviews, authReady]);
 
   // ------------------------------------------
   // PERMISSION CHECK
   // ------------------------------------------
-  const notAllowed = !currentUser || currentUser.id !== id;
+  const notAllowed = authReady && (!currentUser || currentUser.id !== id);
 
   // ------------------------------------------
   // DELETE REVIEW
@@ -82,17 +87,7 @@ export default function UserReviews() {
     if (!reviewToDelete) return;
 
     try {
-      const token = localStorage.getItem("authToken");
-      const res = await fetch(
-        `http://localhost:5000/api/reviews/${reviewToDelete}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to delete review.");
+      await deleteReview(reviewToDelete); // 🔥 uses API_BASE_URL + auth token
 
       // Remove from UI instantly
       setReviews((prev) => prev.filter((r) => r._id !== reviewToDelete));
@@ -107,6 +102,15 @@ export default function UserReviews() {
   // ------------------------------------------
   // RENDER
   // ------------------------------------------
+  // while auth is still initializing, show nothing or a tiny loader
+  if (!authReady) {
+    return (
+      <section className="min-h-[90vh] flex items-center justify-center">
+        <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+      </section>
+    );
+  }
+
   return (
     <section className="min-h-[90vh] flex flex-col items-center px-6 py-16">
       <motion.div

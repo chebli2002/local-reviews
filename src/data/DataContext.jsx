@@ -66,6 +66,9 @@ export function DataProvider({ children }) {
   const [reviews, setReviews] = useState([]); // global caching of user's reviews
   const [currentUser, setCurrentUser] = useState(null);
 
+  // NEW: flag so the app knows when we've finished checking localStorage
+  const [authReady, setAuthReady] = useState(false);
+
   // ----------------------------------------------
   // LOAD USER FROM LOCAL STORAGE
   // ----------------------------------------------
@@ -75,8 +78,12 @@ export function DataProvider({ children }) {
       try {
         const normalized = normalizeUser(JSON.parse(storedUser));
         setCurrentUser(normalized);
-      } catch {}
+      } catch {
+        // ignore parse errors, treat as logged out
+      }
     }
+    // we're done checking localStorage either way
+    setAuthReady(true);
   }, []);
 
   // ----------------------------------------------
@@ -165,7 +172,7 @@ export function DataProvider({ children }) {
   };
 
   // ----------------------------------------------
-  // DELETE BUSINESS (unchanged)
+  // DELETE BUSINESS
   // ----------------------------------------------
   const deleteBusiness = async (businessId) => {
     if (!currentUser) throw new Error("You must log in first.");
@@ -222,7 +229,7 @@ export function DataProvider({ children }) {
   };
 
   // ----------------------------------------------
-  // ⭐ DELETE REVIEW
+  // DELETE REVIEW
   // ----------------------------------------------
   const deleteReview = async (reviewId) => {
     const token = localStorage.getItem("authToken");
@@ -242,7 +249,7 @@ export function DataProvider({ children }) {
   };
 
   // ----------------------------------------------
-  // ⭐ EDIT REVIEW
+  // EDIT REVIEW
   // ----------------------------------------------
   const updateReview = async (reviewId, payload) => {
     const token = localStorage.getItem("authToken");
@@ -297,6 +304,7 @@ export function DataProvider({ children }) {
     businesses: businessesWithRatings,
     rawBusinesses: businesses,
     currentUser,
+    authReady, // <- NEW
     addReview,
     deleteReview,
     updateReview,

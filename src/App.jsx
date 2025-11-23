@@ -18,8 +18,16 @@ import About from "./components/About.jsx";
 import MyBusinesses from "./components/business/MyBusinesses.jsx";
 
 function ProtectedRoute({ children }) {
-  const { currentUser } = useData();
+  const { currentUser, authReady } = useData();
+
+  // Wait until DataContext has finished checking localStorage
+  if (!authReady) {
+    return null; // or a loading spinner component if you want
+  }
+
+  // Once auth state is ready, enforce protection
   if (!currentUser) return <Navigate to="/login" replace />;
+
   return children;
 }
 
