@@ -28,6 +28,12 @@ export default function RegisterForm() {
     confirm: "",
   });
   const [error, setError] = useState("");
+  const passwordChecks = {
+    length: form.password.length >= 8,
+    uppercase: /[A-Z]/.test(form.password),
+    number: /\d/.test(form.password),
+    special: /[!@#$%^&*(),.?":{}|<>]/.test(form.password),
+  };
 
   const handleChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -37,8 +43,17 @@ export default function RegisterForm() {
     setError("");
     if (!form.username || !form.email || !form.password)
       return setError("All fields are required.");
-    if (form.password.length < 6)
-      return setError("Password must be at least 6 characters.");
+    if (
+      !passwordChecks.length ||
+      !passwordChecks.uppercase ||
+      !passwordChecks.number ||
+      !passwordChecks.special
+    ) {
+      return setError(
+        "Password must be at least 8 characters, with an uppercase letter, a number, and a special character."
+      );
+    }
+
     if (form.password !== form.confirm)
       return setError("Passwords do not match.");
     try {
@@ -102,6 +117,49 @@ export default function RegisterForm() {
                   className="w-full rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-400 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 outline-none transition-all duration-300 shadow-sm hover:shadow-md"
                   placeholder={`Enter your ${label.toLowerCase()}`}
                 />
+
+                {name === "password" && (
+                  <div className="mt-2 text-xs space-y-1">
+                    <p
+                      className={
+                        passwordChecks.length
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {passwordChecks.length ? "✔" : "✘"} Minimum 8 characters
+                    </p>
+                    <p
+                      className={
+                        passwordChecks.uppercase
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {passwordChecks.uppercase ? "✔" : "✘"} At least one
+                      uppercase letter
+                    </p>
+                    <p
+                      className={
+                        passwordChecks.number
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {passwordChecks.number ? "✔" : "✘"} At least one number
+                    </p>
+                    <p
+                      className={
+                        passwordChecks.special
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {passwordChecks.special ? "✔" : "✘"} At least one special
+                      character
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
 
